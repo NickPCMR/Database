@@ -1,0 +1,15 @@
+{
+  "name": "340_project",
+  "version": "1.0.0",
+  "description": "Project for CS340",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matthew Yang & Nicholas Osborne",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "forever": "^4.0.1"
+  }
+}
