@@ -1,3 +1,5 @@
+// This app was initialized using this guide: https://github.com/osu-cs340-ecampus/nodejs-starter-app
+
 /*
     SETUP
 */
