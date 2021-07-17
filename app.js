@@ -3,15 +3,67 @@
 /*
     SETUP
 */
-var express = require('express');
-var app     = express();
-PORT        = 9124;                 
+const express        = require('express');
+const expressLayouts = require('express-ejs-layouts');
+const session        = require('express-session');
+
+const app = express();
+PORT      = process.env.PORT || 3000;
+
+app.use(expressLayouts);
+app.set('layout', './main-layout');
+app.set('view engine', 'ejs');
+
+app.use(express.static('public'));
+
+app.use(session({secret: 'ThisIsASecret'}));
 
 /*
     ROUTES
 */
-app.get('/', function(req, res){
-    res.send("The server is running!")
+
+// Main index
+app.get('/', (req, res) => {
+    // if(!req.session.email){
+        res.render('sign-in');
+    // }
+    // else{
+    //     res.redirect('/workouts');
+    // }
+});
+
+// Sign in
+app.post('/sign-in', (req, res) => {
+    res.redirect('/workouts');
+});
+
+// Sign out
+app.get('/sign-out', (rea, res) => {
+    res.redirect('/');
+});
+
+//////////////
+// Workouts //
+//////////////
+
+// Workouts index
+app.get('/workouts', (req, res) => {
+    res.render('workouts/index');
+});
+
+// Workouts new
+app.get('/workouts/new', (req, res) => {
+    res.render('workouts/new');
+});
+
+// Workouts detail
+app.get('/workouts/:workout_id', (req, res) => {
+    res.render('workouts/detail');
+});
+
+// Workouts edit
+app.get('/workouts/:workout_id/edit', (req, res) => {
+    res.render('workouts/detail');
 });
 
 /*
