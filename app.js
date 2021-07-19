@@ -88,7 +88,7 @@ app.post('/workouts/:workout_id/edit', (req, res) => {
 });
 
 // Add exercise to workout
-app.post('/workouts/:workout_id/exercises/:exercise_id', (req, res) => {
+app.post('/workouts/:workout_id/exercises', (req, res) => {
     res.redirect('/workouts/1');
 });
 
@@ -129,7 +129,7 @@ app.post('/exercises/:exercise_id', (req, re) => {
 });
 
 // Add equipment to exercise
-app.post('/exercises/:exercise_id/equipment/:equipmentid', (req, res) => {
+app.post('/exercises/:exercise_id/equipment', (req, res) => {
     res.redirect('/exercises/1');
 });
 
