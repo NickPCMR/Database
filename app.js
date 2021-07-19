@@ -3,20 +3,24 @@
 /*
     SETUP
 */
-const express        = require('express');
+const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
-const session        = require('express-session');
+const session = require('express-session');
+const ejsMate = require('ejs-mate');
+const path = require('path');
 
 const app = express();
-PORT      = process.env.PORT || 3000;
+PORT = process.env.PORT || 3000;
 
+app.engine('ejs', ejsMate)
 app.use(expressLayouts);
 app.set('layout', './main-layout');
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.static('public'));
 
-app.use(session({secret: 'ThisIsASecret'}));
+app.use(session({ secret: 'ThisIsASecret' }));
 
 /*
     ROUTES
@@ -25,7 +29,7 @@ app.use(session({secret: 'ThisIsASecret'}));
 // Main index
 app.get('/', (req, res) => {
     // if(!req.session.email){
-        res.render('sign-in');
+    res.render('sign-in');
     // }
     // else{
     //     res.redirect('/workouts');
@@ -56,6 +60,10 @@ app.get('/workouts/new', (req, res) => {
     res.render('workouts/new');
 });
 
+app.post('/workouts/new', (req, res) => {
+    res.redirect('workouts/index')
+})
+
 // Workouts detail
 app.get('/workouts/:workout_id', (req, res) => {
     res.render('workouts/detail');
@@ -69,6 +77,6 @@ app.get('/workouts/:workout_id/edit', (req, res) => {
 /*
     LISTENER
 */
-app.listen(PORT, function(){
+app.listen(PORT, function () {
     console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
 });
