@@ -41,8 +41,17 @@ app.post('/sign-in', (req, res) => {
     res.redirect('/workouts');
 });
 
+// Sign up
+app.get('/sign-up', (req, res) => {
+    res.render('sign-up');
+});
+
+app.post('/sign-up', (req, res) => {
+    res.redirect('/workouts');
+});
+
 // Sign out
-app.get('/sign-out', (rea, res) => {
+app.get('/sign-out', (req, res) => {
     res.redirect('/');
 });
 
@@ -69,9 +78,46 @@ app.get('/workouts/:workout_id', (req, res) => {
     res.render('workouts/detail');
 });
 
-// Workouts edit
-app.get('/workouts/:workout_id/edit', (req, res) => {
+// Add exercise to workout
+app.post('/workouts/:workout_id/exercises/:exercise_id', (req, res) => {
     res.render('workouts/detail');
+});
+
+// Remove exercise from workout
+app.delete('/workouts/:workout_id/exercises/:exercise_id', (req, res) => {
+    res.render('workouts/detail');
+});
+
+///////////////
+// Exercises //
+///////////////
+
+// Exercises index
+app.get('/exercises', (req, res) => {
+    res.render('exercises/index');
+});
+
+// Exercises new
+app.get('/exercises/new', (req, res) => {
+    res.render('exercises/new');
+});
+
+app.post('/exercises/new', (req, res) => {
+    res.render('exercises/detail');
+});
+
+// Exercises detail
+app.get('/exercises/:exercise_id', (req, res) => {
+    res.render('exercises/detail');
+});
+
+// Exercises edit
+app.get('/exercises/:exercise_id/edit', (req, res) => {
+    res.render('exercises/edit');
+});
+
+app.put('/exercises/:exercise_id', (req, re) => {
+    res.render('exercises/detail');
 });
 
 /*

@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="col-6 offset-3">
+    <h1>Bench Press</h1>
+    <p>a lift or exercise in which a weight is raised by extending the arms upward while lying on a bench</p>
+    <a href="/exercises/1/edit">Edit exercise name/description</a>
+    
+    <div class="mb-3">
+      <select class="form-select form-select-lg mb-3" aria-label="Add Equipment" id="add-equipment">
+        <option selected>Add equipment</option>
+        <option value="3">Barbell</option>
+        <option value="4">Dumbell</option>
+      </select>
+      <form id="add-equipment" action="/exercises/1/equipment" method="post">
+        <button type="submit" class="btn btn-success">Add</button>
+      </form>
+    </div>
+  
+    <h3>Equipment:</h3>
+
+    <ul>
+      <!-- These remove buttons will have to call a function to delete the relationship
+      and then remove the li -->
+      <li><a href="/equipment/1">Barbell</a> <button type="button" class="btn btn-danger" name="remove-equipment" id="1">Remove</button></li>
+      <li><a href="/equipment/2">Dumbell</a> <button type="button" class="btn btn-danger" name="remove-equipment" id="2">Remove</button></li>
+    </ul>
+  </div>  
+</div>
