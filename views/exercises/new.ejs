@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="col-6 offset-3">
+        <form action="/exercises/new" method="post" class="validated-form">
+            <div class="mb-3">
+                <h1>Add an Exercise</h1>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="name">Name</label>
+                <input class="form-control" type="text" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="category">Select Category</label>
+              <select class="form-select form-select-lg mb-3" aria-label="Add Category">
+                <option selected>Add a category</option>
+                <option value="1">Cardio</option>
+                <option value="2">Weight Training</option>
+                <option value="3">Stretching</option>
+              </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="description">Description</label>
+                <textarea class="form-control" id="description" name="description"></textarea>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-success">Add exercise</button>
+            </div>
+        </form>
+    </div>
+</div>
