@@ -55,6 +55,15 @@ app.get('/sign-out', (req, res) => {
     res.redirect('/');
 });
 
+// Search
+app.get('/search', (req, res) => {
+    res.render('search');
+});
+
+app.post('/search', (req, res) => {
+    res.render('search-results');
+});
+
 //////////////
 // Workouts //
 //////////////
