@@ -1,4 +1,11 @@
-
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Users,
+Workouts,
+Categories,
+Equipment,
+Exercises,
+WorkoutsExercises,
+ExercisesEquipment;
 
 CREATE TABLE Users (
     userID INT(11) AUTO_INCREMENT,
