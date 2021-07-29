@@ -9,6 +9,8 @@ const session = require('express-session');
 const ejsMate = require('ejs-mate');
 const path = require('path');
 
+const mysql = require('./helpers/dbcon.js');
+
 const app = express();
 PORT = process.env.PORT || 3000;
 
