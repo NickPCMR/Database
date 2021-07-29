@@ -18,6 +18,7 @@ CREATE TABLE Users (
 CREATE TABLE Workouts (
     workoutID INT(11) AUTO_INCREMENT,
     `date` DATE NOT NULL,
+    `description` VARCHAR(255),
     userID INT(11) NOT NULL,
     PRIMARY KEY (workoutID),
     FOREIGN KEY (userID)
@@ -86,9 +87,9 @@ INSERT INTO Equipment (name, description) VALUES
 ('rowing machine', 'An exercise machine with a sliding seat that mimics the motions of rowing a boat'),
 ('kettlebell','A large cast-iron ball-shaped weight with a single handle');
 
-INSERT INTO Workouts (date, userID) VALUES
-('2021-08-21', 1),
-('2021-08-21',2);
+INSERT INTO Workouts (date, description, userID) VALUES
+('2021-08-21','Bench Press 150 lbs',1),
+('2021-08-21','Push Ups 20 reps',2);
 
 INSERT INTO WorkoutsExercises (workoutID,exerciseID) VALUES
 (1,1),
