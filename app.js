@@ -10,6 +10,8 @@ const path = require('path');
 const bodyParser = require('body-parser');
 
 const mysql = require('./helpers/dbcon.js');
+const queryHelper = require('./helpers/queries.js');
+const queries = queryHelper.queries;
 
 const app = express();
 PORT = process.env.PORT || 3000;
@@ -50,9 +52,9 @@ app.post('/search', (req, res) => {
 app.get('/users', (req, res, next) => {
     let data = { locals: {} };
     
-    query = 'SELECT userID, firstName, lastName, email FROM Users';
+    users_query = queries.users.select_all;
     
-    mysql.pool.query(query, (error, rows, _fields) => {
+    mysql.pool.query(users_query, (error, rows, _fields) => {
         data.locals.users = rows;
         
         res.render('users/index', data);
@@ -66,17 +68,15 @@ app.get('/users/:user_id', (req, res, next) => {
     let data = { locals: {} };
     const userId = req.params.user_id;
     
-    user_query = 'SELECT userID, firstName, lastName, email FROM Users WHERE userID = ?';
-    workouts_query = 'SELECT workoutID, date FROM Workouts WHERE userID = ?';
+    user_query = queries.users.find_by_id;
+    workouts_query = queries.workouts.by_user_id;
     
     mysql.pool.query(user_query, [userId], (error, rows, _fields) => {
-        console.log(rows)
         if(rows.length > 0) {
             data.locals.user = rows[0];
             
             mysql.pool.query(workouts_query, [userId], (error, rows, _fields) => {
                 data.locals.workouts = rows;
-                console.log(data);
                 
                 res.render('users/detail', data);
             });
