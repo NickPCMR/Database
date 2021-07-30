@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="col-6 offset-3">
+    <h1>Users Index</h1>
+    
+    <a class="btn btn-primary" href="/users/new">New user</a>
+    
+    <% if(locals.users) { %>
+      <ul>
+        <% locals.users.forEach((user) => { %>
+          <li>
+            <a href="/users/<%= user.userID %>">
+              <%= (user.firstName + ' ' + user.lastName + ' - ' + user.email) %>
+            </a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No users found.</p>
+    <% } %>
+  </div>
+</div>

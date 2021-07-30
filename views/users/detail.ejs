@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-6 offset-3">
+    <h1><%= (locals.user.firstName + ' ' + locals.user.lastName) %></h1>
+    <p><%= locals.user.email %></p>
+    <a href="/users/<%= locals.user.userID %>/edit">Edit user</a>
+  
+    <h3>Workouts:</h3>
+
+    <ul>
+      <% if(locals.workouts.length > 0) { %>
+        <% locals.workouts.forEach((workout) => { %>
+          <li>
+            <a href="/workouts/<%= workout.workoutID %>">
+              <%= workout.date %>
+            </a>
+          </li>
+        <% }) %>
+      <% } else { %>
+        <p>User has no workouts</p>
+      <% } %>
+    </ul>
+  </div>
+</div>

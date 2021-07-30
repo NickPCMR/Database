@@ -5,9 +5,9 @@
 */
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
-const session = require('express-session');
 const ejsMate = require('ejs-mate');
 const path = require('path');
+const bodyParser = require('body-parser');
 
 const mysql = require('./helpers/dbcon.js');
 
@@ -15,14 +15,14 @@ const app = express();
 PORT = process.env.PORT || 3000;
 
 app.engine('ejs', ejsMate)
+
 app.use(expressLayouts);
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: false }));
+
 app.set('layout', './main-layout');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
-
-app.use(express.static('public'));
-
-app.use(session({ secret: 'ThisIsASecret' }));
 
 /*
     ROUTES
@@ -30,31 +30,7 @@ app.use(session({ secret: 'ThisIsASecret' }));
 
 // Main index
 app.get('/', (req, res) => {
-    // if(!req.session.email){
-    res.render('sign-in');
-    // }
-    // else{
-    //     res.redirect('/workouts');
-    // }
-});
-
-// Sign in
-app.post('/sign-in', (req, res) => {
-    res.redirect('/workouts');
-});
-
-// Sign up
-app.get('/sign-up', (req, res) => {
-    res.render('sign-up');
-});
-
-app.post('/sign-up', (req, res) => {
-    res.redirect('/workouts');
-});
-
-// Sign out
-app.get('/sign-out', (req, res) => {
-    res.redirect('/');
+    res.render('index');
 });
 
 // Search
@@ -64,6 +40,51 @@ app.get('/search', (req, res) => {
 
 app.post('/search', (req, res) => {
     res.render('search-results');
+});
+
+///////////
+// USERS //
+///////////
+
+// Users index
+app.get('/users', (req, res, next) => {
+    let data = { locals: {} };
+    
+    query = 'SELECT userID, firstName, lastName, email FROM Users';
+    
+    mysql.pool.query(query, (error, rows, _fields) => {
+        data.locals.users = rows;
+        
+        res.render('users/index', data);
+    });
+});
+
+// Users new
+
+// Users detail
+app.get('/users/:user_id', (req, res, next) => {
+    let data = { locals: {} };
+    const userId = req.params.user_id;
+    
+    user_query = 'SELECT userID, firstName, lastName, email FROM Users WHERE userID = ?';
+    workouts_query = 'SELECT workoutID, date FROM Workouts WHERE userID = ?';
+    
+    mysql.pool.query(user_query, [userId], (error, rows, _fields) => {
+        console.log(rows)
+        if(rows.length > 0) {
+            data.locals.user = rows[0];
+            
+            mysql.pool.query(workouts_query, [userId], (error, rows, _fields) => {
+                data.locals.workouts = rows;
+                console.log(data);
+                
+                res.render('users/detail', data);
+            });
+        } else {
+            res.status(404);
+            res.render('404');
+        }
+    });
 });
 
 //////////////
