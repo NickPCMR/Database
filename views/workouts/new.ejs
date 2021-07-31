@@ -2,14 +2,25 @@
     <div class="col-6 offset-3">
         <form action="/workouts/new" method="post" class="validated-form">
             <div class="mb-3">
-                <h1>Add a Workout</h1>
+                <h1>Create a Workout</h1>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="user">Select User</label>
+              <select class="form-select form-select-lg mb-3" aria-label="Select User" name="userId" required>
+                <option selected>Select a user</option>
+                <% locals.users.forEach((user) => { %>
+                    <option value="<%= user.userID %>">
+                        <%= user.firstName + ' ' + user.lastName + ' - ' + user.email %>
+                    </option>
+                <% }); %>
+              </select>
             </div>
             <div class="mb-3">
                 <label class="form-label" for="date">Date</label>
                 <input class="form-control" type="date" id="date" name="date" required>
             </div>
             <div class="mb-3">
-                <button type="submit" class="btn btn-success">Add workout</button>
+                <button type="submit" class="btn btn-success">Submit</button>
             </div>
         </form>
     </div>

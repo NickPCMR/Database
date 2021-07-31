@@ -73,6 +73,9 @@ app.get('/users/new', (req, res) => {
 
 app.post('/users/new', (req, res) => {
     let data = { locals: {} };
+    if(req.query.error) {
+        data.locals.error = req.query.error;
+    }
     
     const email = req.body.email;
     const firstName = req.body.firstName;
@@ -81,19 +84,10 @@ app.post('/users/new', (req, res) => {
     if(email && firstName && lastName) {
         create_query = queries.users.create;
         
-        mysql.pool.query(create_query, [email, firstName, lastName], (error, rows, _fields) => {
+        mysql.pool.query(create_query, [email, firstName, lastName], (error, results, _fields) => {
             if(!error) {
-                find_by_email_query = queries.users.find_by_email;
-                
-                mysql.pool.query(find_by_email_query, [email], (error, rows, _fields) => {
-                    if(!error) {
-                        res.redirect(`/users/${rows[0].userID}?success=${encodeURIComponent('User created successfully')}`);
-                    } else {
-                        data.locals.error = error;
-                        res.status(500);
-                        res.render('500', data);
-                    }
-                });
+                const userId = results.insertId;
+                res.redirect(`/users/${userId}?success=${encodeURIComponent('User created successfully')}`);
             } else if(error.message.match(/Duplicate entry/)){
                 res.status(400);
                 data.locals.error = "Email is already taken.";
@@ -236,7 +230,7 @@ app.delete('/users/:user_id', (req, res) => {
     
     mysql.pool.query(user_delete_query, [userId], (error, rows, _fields) => {
         if(!error) {
-            res.send(204);
+            res.sendStatus(204);
         } else {
             data.locals.error = error;
             res.status(500);
@@ -256,11 +250,49 @@ app.get('/workouts', (req, res) => {
 
 // Workouts new
 app.get('/workouts/new', (req, res) => {
-    res.render('workouts/new');
+    let data = { locals: {} };
+    
+    users_query = queries.users.select_all;
+    
+    mysql.pool.query(users_query, (error, rows, _fields) => {
+        if(!error) {
+            if(rows.length > 0) {
+                data.locals.users = rows;
+                res.render('workouts/new', data);
+            } else {
+                res.redirect(`/users/new?error=${encodeURIComponent("Must create a user before creating a workout")}`);
+            }
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 app.post('/workouts/new', (req, res) => {
-    res.redirect('workouts/index')
+    let data = { locals: {} };
+    
+    const userId = req.body.userId;
+    const date = req.body.date;
+    
+    if(userId && date) {
+        workouts_create_query = queries.workouts.create;
+        
+        mysql.pool.query(workouts_create_query, [userId, date], (error, results, fields) => {
+            if(!error) {
+                const workoutId = results.insertId;
+                res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Workout created successfully')}`);
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.render('workouts/new', { locals: { error: 'User and Date are required' } });
+    }
 })
 
 // Workouts detail
