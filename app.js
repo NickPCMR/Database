@@ -245,7 +245,23 @@ app.delete('/users/:user_id', (req, res) => {
 
 // Workouts index
 app.get('/workouts', (req, res) => {
-    res.render('workouts/index');
+    let data = { locals: {} };
+    if(req.query.success) {
+        data.locals.success = req.query.success;
+    }
+    
+    workouts_query = queries.workouts.select_all_with_users;
+    
+    mysql.pool.query(workouts_query, (error, rows, _fields) => {
+        if(!error) {
+            data.locals.workouts = rows;
+            res.render('workouts/index', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 // Workouts new

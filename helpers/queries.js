@@ -8,7 +8,9 @@ exports.queries = {
     create: 'INSERT INTO Users(email, firstName, lastName) VALUES (?, ?, ?)'
   },
   workouts: {
-    by_user_id: 'SELECT workoutID, date FROM Workouts WHERE userID = ?',
+    select_all: 'SELECT workoutID, date, description FROM Workouts',
+    select_all_with_users: 'SELECT workoutID, date, description, email, firstName, lastName FROM Workouts INNER JOIN Users ON Workouts.userID = Users.userID',
+    by_user_id: 'SELECT workoutID, date, description FROM Workouts WHERE userID = ?',
     create: 'INSERT INTO Workouts(userID, date) VALUES (?, ?)'
   }
 }

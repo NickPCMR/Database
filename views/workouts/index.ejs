@@ -5,15 +5,17 @@
     <a class="btn btn-primary" href="/workouts/new">New Workout</a>
 
     <ul>
-      <li>
-        <a href="/workouts/1">Workout 1</a>
-      </li>
-      <li>
-        <a href="/workouts/2">Workout 2</a>
-      </li>
-      <li>
-        <a href="/workouts/3">Workout 3</a>
-      </li>
+      <% if(locals.workouts.length > 0) { %>
+        <% locals.workouts.forEach((workout) => { %>
+          <li>
+            <a href="/workouts/<%= workout.workoutID %>">
+              <%= workout.date + ' - ' + workout.firstName + ' ' + workout.lastName + ' ' + workout.email %>
+            </a>
+          </li>
+        <% }); %>
+      <% } else { %>
+        <p>No workouts found</p>
+      <% } %>
     </ul>
   </div>
 </div>
