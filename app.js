@@ -151,6 +151,81 @@ app.get('/users/:user_id', (req, res, next) => {
 });
 
 // Users edit
+app.get('/users/:user_id/edit', (req, res) => {
+    let data = { locals: {} };
+    
+    const userId = req.params.user_id;
+    
+    user_query = queries.users.find_by_id;
+    
+    mysql.pool.query(user_query, [userId], (error, rows, _fields) => {
+        if(!error) {
+            if(rows.length > 0) {
+                data.locals.user = rows[0];
+                
+                res.render('users/edit', data);
+            } else {
+                res.status(404);
+                res.render('404');
+            }
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
+});
+
+app.post('/users/:user_id/edit', (req, res) => {
+    let data = { locals: {} };
+    
+    const userId = req.params.user_id;
+    
+    const email = req.body.email;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    
+    const userData = {
+        userID: userId,
+        email: email,
+        firstName: firstName,
+        lastName: lastName
+    };
+    
+    if(email && firstName && lastName) {
+        user_edit_query = queries.users.edit_by_id;
+        
+        mysql.pool.query(user_edit_query, [email, firstName, lastName, userId], (error, rows, _fields) => {
+            if(!error) {
+                find_by_id_query = queries.users.find_by_id;
+                
+                mysql.pool.query(find_by_id_query, [userId], (error, rows, _fields) => {
+                    if(!error) {
+                        res.redirect(`/users/${rows[0].userID}?success=${encodeURIComponent('User updated successfully')}`);
+                    } else {
+                        data.locals.error = error;
+                        res.status(500);
+                        res.render('500', data);
+                    }
+                });
+            } else if(error.message.match(/Duplicate entry/)){
+                res.status(400);
+                data.locals.error = "Email is already taken.";
+                data.locals.user = userData;
+                res.render('users/edit', data);
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        data.locals.error = 'Email, First Name and Last Name are required';
+        data.locals.user = userData;
+        res.render('users/edit', data);
+    }
+});
 
 // Users delete
 app.delete('/users/:user_id', (req, res) => {

@@ -29,7 +29,7 @@
     document.getElementById("deleteUser").addEventListener("click", () => {
       deleteUser(<%= locals.user.userID %>).then(_res => {
         window.location.href = `/users?success=${encodeURIComponent('User deleted successfully')}`;
-      }).catch(error => { console.log(error) });
+      }).catch(error => { console.log(error); });
     });
     
     function deleteUser(userID) {

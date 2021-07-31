@@ -3,6 +3,7 @@ exports.queries = {
     select_all: 'SELECT userID, firstName, lastName, email FROM Users',
     find_by_id: 'SELECT userID, firstName, lastName, email FROM Users WHERE userID = ?',
     delete_by_id: 'DELETE FROM Users WHERE userID = ?',
+    edit_by_id: 'UPDATE Users SET email = ?, firstName = ?, lastName = ? WHERE userID = ?',
     find_by_email: 'SELECT userID, firstName, lastName, email FROM Users WHERE email = ?',
     create: 'INSERT INTO Users(email, firstName, lastName) VALUES (?, ?, ?)'
   },
