@@ -53,6 +53,9 @@ app.post('/search', (req, res) => {
 // Users index
 app.get('/users', (req, res) => {
     let data = { locals: {} };
+    if(req.query.success) {
+        data.locals.success = req.query.success;
+    }
     
     users_query = queries.users.select_all;
     
@@ -84,7 +87,7 @@ app.post('/users/new', (req, res) => {
                 
                 mysql.pool.query(find_by_email_query, [email], (error, rows, _fields) => {
                     if(!error) {
-                        res.redirect(`/users/${rows[0].userID}`);
+                        res.redirect(`/users/${rows[0].userID}?success=${encodeURIComponent('User created successfully')}`);
                     } else {
                         data.locals.error = error;
                         res.status(500);
@@ -110,6 +113,10 @@ app.post('/users/new', (req, res) => {
 // Users detail
 app.get('/users/:user_id', (req, res, next) => {
     let data = { locals: {} };
+    if(req.query.success) {
+        data.locals.success = req.query.success;
+    }
+    
     const userId = req.params.user_id;
     
     user_query = queries.users.find_by_id;
@@ -144,6 +151,24 @@ app.get('/users/:user_id', (req, res, next) => {
 });
 
 // Users edit
+
+// Users delete
+app.delete('/users/:user_id', (req, res) => {
+    let data = { locals: {} };
+    const userId = req.params.user_id;
+    
+    user_delete_query = queries.users.delete_by_id;
+    
+    mysql.pool.query(user_delete_query, [userId], (error, rows, _fields) => {
+        if(!error) {
+            res.send(204);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
+});
 
 //////////////
 // Workouts //
