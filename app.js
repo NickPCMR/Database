@@ -36,10 +36,12 @@ app.get('/', (req, res) => {
 });
 
 // Search
+// TODO
 app.get('/search', (req, res) => {
     res.render('search');
 });
 
+// TODO
 app.post('/search', (req, res) => {
     res.render('search-results');
 });
@@ -49,7 +51,7 @@ app.post('/search', (req, res) => {
 ///////////
 
 // Users index
-app.get('/users', (req, res, next) => {
+app.get('/users', (req, res) => {
     let data = { locals: {} };
     
     users_query = queries.users.select_all;
@@ -62,6 +64,48 @@ app.get('/users', (req, res, next) => {
 });
 
 // Users new
+app.get('/users/new', (req, res) => {
+    res.render('users/new');
+});
+
+app.post('/users/new', (req, res) => {
+    let data = { locals: {} };
+    
+    const email = req.body.email;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    
+    if(email && firstName && lastName) {
+        create_query = queries.users.create;
+        
+        mysql.pool.query(create_query, [email, firstName, lastName], (error, rows, _fields) => {
+            if(!error) {
+                find_by_email_query = queries.users.find_by_email;
+                
+                mysql.pool.query(find_by_email_query, [email], (error, rows, _fields) => {
+                    if(!error) {
+                        res.redirect(`/users/${rows[0].userID}`);
+                    } else {
+                        data.locals.error = error;
+                        res.status(500);
+                        res.render('500', data);
+                    }
+                });
+            } else if(error.message.match(/Duplicate entry/)){
+                res.status(400);
+                data.locals.error = "Email is already taken.";
+                res.render('users/new', data);
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.render('users/new', { locals: { error: 'Email, First Name and Last Name are required.' } });
+    }
+});
 
 // Users detail
 app.get('/users/:user_id', (req, res, next) => {
@@ -72,20 +116,34 @@ app.get('/users/:user_id', (req, res, next) => {
     workouts_query = queries.workouts.by_user_id;
     
     mysql.pool.query(user_query, [userId], (error, rows, _fields) => {
-        if(rows.length > 0) {
-            data.locals.user = rows[0];
-            
-            mysql.pool.query(workouts_query, [userId], (error, rows, _fields) => {
-                data.locals.workouts = rows;
+        if(!error) {
+            if(rows.length > 0) {
+                data.locals.user = rows[0];
                 
-                res.render('users/detail', data);
-            });
+                mysql.pool.query(workouts_query, [userId], (error, rows, _fields) => {
+                    if(!error) {
+                        data.locals.workouts = rows;
+                        
+                        res.render('users/detail', data);
+                    } else {
+                        data.locals.error = error;
+                        res.status(500);
+                        res.render('500', data);
+                    }
+                });
+            } else {
+                res.status(404);
+                res.render('404');
+            }
         } else {
-            res.status(404);
-            res.render('404');
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
         }
     });
 });
+
+// Users edit
 
 //////////////
 // Workouts //
