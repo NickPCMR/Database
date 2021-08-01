@@ -59,7 +59,7 @@ app.get('/users', (req, res) => {
     
     users_query = queries.users.select_all;
     
-    mysql.pool.query(users_query, (error, rows, _fields) => {
+    db.pool.query(users_query, (error, rows, _fields) => {
         data.locals.users = rows;
         
         res.render('users/index', data);
@@ -84,7 +84,7 @@ app.post('/users/new', (req, res) => {
     if(email && firstName && lastName) {
         create_query = queries.users.create;
         
-        mysql.pool.query(create_query, [email, firstName, lastName], (error, results, _fields) => {
+        db.pool.query(create_query, [email, firstName, lastName], (error, results, _fields) => {
             if(!error) {
                 const userId = results.insertId;
                 res.redirect(`/users/${userId}?success=${encodeURIComponent('User created successfully')}`);
@@ -116,12 +116,12 @@ app.get('/users/:user_id', (req, res, next) => {
     user_query = queries.users.find_by_id;
     workouts_query = queries.workouts.by_user_id;
     
-    mysql.pool.query(user_query, [userId], (error, rows, _fields) => {
+    db.pool.query(user_query, [userId], (error, rows, _fields) => {
         if(!error) {
             if(rows.length > 0) {
                 data.locals.user = rows[0];
                 
-                mysql.pool.query(workouts_query, [userId], (error, rows, _fields) => {
+                db.pool.query(workouts_query, [userId], (error, rows, _fields) => {
                     if(!error) {
                         data.locals.workouts = rows;
                         
@@ -152,7 +152,7 @@ app.get('/users/:user_id/edit', (req, res) => {
     
     user_query = queries.users.find_by_id;
     
-    mysql.pool.query(user_query, [userId], (error, rows, _fields) => {
+    db.pool.query(user_query, [userId], (error, rows, _fields) => {
         if(!error) {
             if(rows.length > 0) {
                 data.locals.user = rows[0];
@@ -189,11 +189,11 @@ app.post('/users/:user_id/edit', (req, res) => {
     if(email && firstName && lastName) {
         user_edit_query = queries.users.edit_by_id;
         
-        mysql.pool.query(user_edit_query, [email, firstName, lastName, userId], (error, rows, _fields) => {
+        db.pool.query(user_edit_query, [email, firstName, lastName, userId], (error, rows, _fields) => {
             if(!error) {
                 find_by_id_query = queries.users.find_by_id;
                 
-                mysql.pool.query(find_by_id_query, [userId], (error, rows, _fields) => {
+                db.pool.query(find_by_id_query, [userId], (error, rows, _fields) => {
                     if(!error) {
                         res.redirect(`/users/${rows[0].userID}?success=${encodeURIComponent('User updated successfully')}`);
                     } else {
@@ -228,7 +228,7 @@ app.delete('/users/:user_id', (req, res) => {
     
     user_delete_query = queries.users.delete_by_id;
     
-    mysql.pool.query(user_delete_query, [userId], (error, rows, _fields) => {
+    db.pool.query(user_delete_query, [userId], (error, rows, _fields) => {
         if(!error) {
             res.sendStatus(204);
         } else {
@@ -252,7 +252,7 @@ app.get('/workouts', (req, res) => {
     
     workouts_query = queries.workouts.select_all_with_users;
     
-    mysql.pool.query(workouts_query, (error, rows, _fields) => {
+    db.pool.query(workouts_query, (error, rows, _fields) => {
         if(!error) {
             data.locals.workouts = rows;
             res.render('workouts/index', data);
@@ -270,7 +270,7 @@ app.get('/workouts/new', (req, res) => {
     
     users_query = queries.users.select_all;
     
-    mysql.pool.query(users_query, (error, rows, _fields) => {
+    db.pool.query(users_query, (error, rows, _fields) => {
         if(!error) {
             if(rows.length > 0) {
                 data.locals.users = rows;
@@ -295,7 +295,7 @@ app.post('/workouts/new', (req, res) => {
     if(userId && date) {
         workouts_create_query = queries.workouts.create;
         
-        mysql.pool.query(workouts_create_query, [userId, date], (error, results, fields) => {
+        db.pool.query(workouts_create_query, [userId, date], (error, results, fields) => {
             if(!error) {
                 const workoutId = results.insertId;
                 res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Workout created successfully')}`);
