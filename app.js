@@ -9,7 +9,7 @@ const ejsMate = require('ejs-mate');
 const path = require('path');
 const bodyParser = require('body-parser');
 
-const mysql = require('./helpers/dbcon.js');
+const db = require('./database/dbcon.js');
 const queryHelper = require('./helpers/queries.js');
 const queries = queryHelper.queries;
 
