@@ -1,7 +1,11 @@
 <div class="row">
   <div class="col-6 offset-3">
     <h1><%= locals.exercise.name %></h1>
-    <p>Category: <a href="/categories/<%= locals.exercise.categoryID %>"><%= locals.exercise.categoryName %></a></p>
+    <% if(locals.exercise.categoryName) { %>
+      <p>Category: <a href="/categories/<%= locals.exercise.categoryID %>"><%= locals.exercise.categoryName %></a></p>
+    <% } else { %>
+      <p>Exercise has no category</p>
+    <% } %>
     <a href="/exercises/<%= locals.exercise.exerciseID %>/edit">Edit exercise details</a>
     <button class="btn btn-danger" id="deleteExercise">Delete Exercise</button>
     
@@ -53,7 +57,7 @@
       const req = new XMLHttpRequest();
       
       return new Promise((resolve, reject) => {
-        let url = `/exercisees/${exerciseID}`;
+        let url = `/exercises/${exerciseID}`;
         req.open('DELETE', url, true);
         req.addEventListener('load', () => {
             if(req.status >= 200 && req.status < 400) {

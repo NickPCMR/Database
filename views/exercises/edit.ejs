@@ -1,19 +1,42 @@
 <div class="row">
     <div class="col-6 offset-3">
-        <form action="/exercises/1/edit" method="post" class="validated-form">
+        <form action="/exercises/<%= locals.exercise.exerciseID %>/edit" method="post" autocomplete="off" class="validated-form">
             <div class="mb-3">
                 <h1>Edit Exercise</h1>
             </div>
             <div class="mb-3">
                 <label class="form-label" for="name">Name</label>
-                <input class="form-control" type="text" id="name" name="name" value="Bench Press" required>
+                <input class="form-control" type="text" id="name" name="name" value="<%= locals.exercise.name %>" required>
             </div>
             <div class="mb-3">
-                <label class="form-label" for="description">Description</label>
-                <textarea class="form-control" id="description" name="description">a lift or exercise in which a weight is raised by extending the arms upward while lying on a bench</textarea>
+              <label class="form-label" for="category">Select Category (optional)</label>
+              <% if(locals.categories.length > 0) { %>
+                  <select class="form-select form-select-lg mb-3" aria-label="Add Category" name="categoryId">
+                    <% if(locals.exercise.categoryID) { %>
+                        <option value="NULL">No category</option>
+                    <% } else { %>
+                        <option value="NULL" selected>No category</option>
+                    <% } %>
+                    <% locals.categories.forEach((category) => { %>
+                        <% if(category.categoryID == locals.exercise.categoryID) { %>
+                            <option value="<%= category.categoryID %>" selected>
+                                <%= category.name %>
+                            </option>
+                        <% } else { %>
+                            <option value="<%= category.categoryID %>">
+                                <%= category.name %>
+                            </option>
+                        <% } %>
+                    <% }); %>
+                  </select>
+              <% } else { %>
+                <label class="form-label" for="name">No categories found - <a href="/categories/new">Create Category</a></label>
+                <input type="hidden" name="categoryId" value="NULL">
+              <% } %>
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-success">Update exercise</button>
+                <a class="btn btn-secondary" href="/exercises/<%= locals.exercise.exerciseID %>">Cancel</a>
             </div>
         </form>
     </div>

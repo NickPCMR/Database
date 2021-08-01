@@ -2,24 +2,27 @@
     <div class="col-6 offset-3">
         <form action="/exercises/new" method="post" class="validated-form">
             <div class="mb-3">
-                <h1>Add an Exercise</h1>
+                <h1>Create an Exercise</h1>
             </div>
             <div class="mb-3">
                 <label class="form-label" for="name">Name</label>
                 <input class="form-control" type="text" id="name" name="name" required>
             </div>
             <div class="mb-3">
-              <label class="form-label" for="category">Select Category</label>
-              <select class="form-select form-select-lg mb-3" aria-label="Add Category">
-                <option selected>Add a category</option>
-                <option value="1">Cardio</option>
-                <option value="2">Weight Training</option>
-                <option value="3">Stretching</option>
-              </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label" for="description">Description</label>
-                <textarea class="form-control" id="description" name="description"></textarea>
+              <label class="form-label" for="category">Select Category (optional)</label>
+              <% if(locals.categories.length > 0) { %>
+                  <select class="form-select form-select-lg mb-3" aria-label="Add Category" name="categoryId">
+                    <option value="NULL" selected>No category</option>
+                    <% locals.categories.forEach((category) => { %>
+                        <option value="<%= category.categoryID %>">
+                            <%= category.name %>
+                        </option>
+                    <% }); %>
+                  </select>
+              <% } else { %>
+                <label class="form-label" for="name">No categories found - <a href="/categories/new">Create Category</a></label>
+                <input type="hidden" name="categoryId" value="NULL">
+              <% } %>
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-success">Add exercise</button>
