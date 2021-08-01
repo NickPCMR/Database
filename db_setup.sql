@@ -20,7 +20,6 @@ CREATE TABLE Workouts (
     `date` DATE NOT NULL,
     `description` VARCHAR(255),
     userID INT(11) NOT NULL,
-    `description` varchar(255),
     PRIMARY KEY (workoutID),
     FOREIGN KEY (userID)
         REFERENCES Users (userID)
