@@ -51,16 +51,26 @@ CREATE TABLE Exercises (
 CREATE TABLE WorkoutsExercises (
     workoutID INT(11),
     exerciseID INT(11),
-    FOREIGN KEY (workoutID) REFERENCES Workouts (workoutID),
-    FOREIGN KEY (exerciseID) REFERENCES Exercises (exerciseID)
+    FOREIGN KEY (workoutID)
+        REFERENCES Workouts (workoutID)
+        ON DELETE CASCADE,
+    FOREIGN KEY (exerciseID)
+        REFERENCES Exercises (exerciseID)
+        ON DELETE CASCADE,
+    PRIMARY KEY (workoutID,exerciseId)
 
 ) ENGINE = InnoDB;
 
 CREATE TABLE ExercisesEquipment (
     exerciseID INT(11),
     equipmentID INT(11),
-    FOREIGN KEY (exerciseID) REFERENCES Exercises (exerciseID),
-    FOREIGN KEY (equipmentID) REFERENCES Equipment (equipmentID)
+    FOREIGN KEY (exerciseID)
+        REFERENCES Exercises (exerciseID)
+        ON DELETE CASCADE,
+    FOREIGN KEY (equipmentID)
+        REFERENCES Equipment (equipmentID)
+        ON DELETE CASCADE,
+    PRIMARY KEY (exerciseID,equipmentID)
 ) ENGINE = InnoDB;
 
 

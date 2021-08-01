@@ -291,11 +291,12 @@ app.post('/workouts/new', (req, res) => {
     
     const userId = req.body.userId;
     const date = req.body.date;
+    const description = req.body.description;
     
     if(userId && date) {
         workouts_create_query = queries.workouts.create;
         
-        db.pool.query(workouts_create_query, [userId, date], (error, results, fields) => {
+        db.pool.query(workouts_create_query, [userId, date, description], (error, results, fields) => {
             if(!error) {
                 const workoutId = results.insertId;
                 res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Workout created successfully')}`);
@@ -313,25 +314,204 @@ app.post('/workouts/new', (req, res) => {
 
 // Workouts detail
 app.get('/workouts/:workout_id', (req, res) => {
-    res.render('workouts/detail');
+    let data = { locals: {} };
+    if(req.query.success) {
+        data.locals.success = req.query.success;
+    }
+    
+    if(req.query.error) {
+        data.locals.error = req.query.error;
+    }
+
+    const workoutId = req.params.workout_id;
+
+    workout_query = queries.workouts.find_by_id;
+
+    db.pool.query(workout_query, [workoutId], (error, rows, _fields) => {
+        if(!error) {
+            if(rows.length > 0) {
+                data.locals.workout = rows[0];
+                
+                exercises_by_workout_query = queries.exercises.by_workout_id;
+                
+                db.pool.query(exercises_by_workout_query, [workoutId], (error, rows, _fields) => {
+                    if(!error) {
+                        data.locals.workoutExercises = rows;
+                        
+                        all_exercises_query = queries.exercises.select_all;
+                        
+                        db.pool.query(all_exercises_query, (error, rows, _fields) => {
+                            if(!error) {
+                                data.locals.allExercises = rows;
+                                
+                                res.render('workouts/detail', data);
+                            } else {
+                                data.locals.error = error;
+                                res.status(500);
+                                res.render('500', data);
+                            }
+                        });
+                    } else {
+                        data.locals.error = error;
+                        res.status(500);
+                        res.render('500', data);
+                    }
+                });
+            } else {
+                res.status(404);
+                res.render('404');
+            }
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 // Workouts edit
 app.get('/workouts/:workout_id/edit', (req, res) => {
-    res.render('workouts/edit');
+    let data = { locals: {} };
+    if(req.query.error) {
+        data.locals.error = req.query.error;
+    }
+
+    const workoutId = req.params.workout_id;
+
+    workout_query = queries.workouts.find_by_id;
+
+    db.pool.query(workout_query, [workoutId], (error, rows, _fields) => {
+        if(!error) {
+            if(rows.length > 0) {
+                data.locals.workout = rows[0];
+                let year = data.locals.workout.date.getFullYear();
+                let day = data.locals.workout.date.getDate();
+                let month = data.locals.workout.date.getMonth() + 1;
+                
+                if(day < 10) {
+                    day = `0${day}`;
+                }
+                
+                if(month < 10) {
+                    month = `0${month}`
+                }
+                
+                const formattedDate = `${year}-` + `${month}-` + `${day}`;
+                data.locals.workout.formattedDate = formattedDate;
+                
+                users_query = queries.users.select_all;
+                
+                db.pool.query(users_query, (error, rows, _fields) => {
+                    if(!error) {
+                        data.locals.users = rows;
+                        res.render('workouts/edit', data);
+                    } else {
+                        data.locals.error = error;
+                        res.status(500);
+                        res.render('500', data);
+                    }
+                });
+            } else {
+                res.status(404);
+                res.render('404');
+            }
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 app.post('/workouts/:workout_id/edit', (req, res) => {
-    res.redirect('/workouts/1');
+    let data = { locals: {} };
+    
+    const workoutId = req.params.workout_id;
+    const userId = req.body.userId;
+    const date = req.body.date;
+    const description = req.body.description;
+    
+    if(userId && date) {
+        workout_edit_query = queries.workouts.edit_by_id;
+        
+        db.pool.query(workout_edit_query, [date, description, userId, workoutId], (error, results, fields) => {
+            if(!error) {
+                res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Workout updated successfully')}`);
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.render('workouts/new', { locals: { error: 'User and Date are required' } });
+    }
 });
 
 // Add exercise to workout
 app.post('/workouts/:workout_id/exercises', (req, res) => {
-    res.redirect('/workouts/1');
+    let data = { locals: {} };
+    
+    const workoutId = req.params.workout_id;
+    const exerciseId = req.body.exerciseId;
+    
+    if(workoutId && exerciseId) {
+        add_exercise_query = queries.exercises.add_to_workout;
+        
+        db.pool.query(add_exercise_query, [workoutId, exerciseId], (error, results, fields) => {
+            if(!error) {
+                res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Exercise added successfully')}`);
+            } else if(error.message.match(/Duplicate entry/)){
+                res.status(400);
+                res.redirect(`/workouts/${workoutId}?error=${encodeURIComponent('Exercise already added to workout')}`);
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.redirect(`/workouts/${workoutId}?error=${encodeURIComponent('Workout ID and Exercise ID are required')}`);
+    }
 });
 
 // Remove exercise from workout
 app.delete('/workouts/:workout_id/exercises/:exercise_id', (req, res) => {
+    let data = { locals: {} };
+    const workoutId = req.params.workout_id;
+    const exerciseId = req.params.exercise_id;
+    
+    remove_exercise_query = queries.exercises.remove_from_workout;
+    
+    db.pool.query(remove_exercise_query, [workoutId, exerciseId], (error, rows, _fields) => {
+        if(!error) {
+            res.sendStatus(204);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
+});
+
+// Workouts delete
+app.delete('/workouts/:workout_id', (req, res) => {
+    let data = { locals: {} };
+    const workoutId = req.params.workout_id;
+    
+    workout_delete_query = queries.workouts.delete_by_id;
+    
+    db.pool.query(workout_delete_query, [workoutId], (error, rows, _fields) => {
+        if(!error) {
+            res.sendStatus(204);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 ///////////////
@@ -340,7 +520,23 @@ app.delete('/workouts/:workout_id/exercises/:exercise_id', (req, res) => {
 
 // Exercises index
 app.get('/exercises', (req, res) => {
-    res.render('exercises/index');
+    let data = { locals: {} };
+    if(req.query.success) {
+        data.locals.success = req.query.success;
+    }
+    
+    exercises_query = queries.exercises.select_all;
+    
+    db.pool.query(exercises_query, (error, rows, _fields) => {
+        if(!error) {
+            data.locals.exercises = rows;
+            res.render('exercises/index', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 // Exercises new
@@ -354,7 +550,59 @@ app.post('/exercises/new', (req, res) => {
 
 // Exercises detail
 app.get('/exercises/:exercise_id', (req, res) => {
-    res.render('exercises/detail');
+    let data = { locals: {} };
+    if(req.query.success) {
+        data.locals.success = req.query.success;
+    }
+    
+    if(req.query.error) {
+        data.locals.error = req.query.error;
+    }
+
+    const exerciseId = req.params.exercise_id;
+
+    exercise_query = queries.exercises.find_by_id_with_category;
+
+    db.pool.query(exercise_query, [exerciseId], (error, rows, _fields) => {
+        if(!error) {
+            if(rows.length > 0) {
+                data.locals.exercise = rows[0];
+                
+                equipment_by_exercise_query = queries.equipment.by_exercise_id;
+                
+                db.pool.query(equipment_by_exercise_query, [exerciseId], (error, rows, _fields) => {
+                    if(!error) {
+                        data.locals.exerciseEquipment = rows;
+                        
+                        all_equipment_query = queries.equipment.select_all;
+                        
+                        db.pool.query(all_equipment_query, (error, rows, _fields) => {
+                            if(!error) {
+                                data.locals.allEquipment = rows;
+                                
+                                res.render('exercises/detail', data);
+                            } else {
+                                data.locals.error = error;
+                                res.status(500);
+                                res.render('500', data);
+                            }
+                        });
+                    } else {
+                        data.locals.error = error;
+                        res.status(500);
+                        res.render('500', data);
+                    }
+                });
+            } else {
+                res.status(404);
+                res.render('404');
+            }
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 // Exercises edit
@@ -371,7 +619,7 @@ app.post('/exercises/:exercise_id/equipment', (req, res) => {
     res.redirect('/exercises/1');
 });
 
-// Remove exercise from workout
+// Remove equipment from exercise
 app.delete('/exercises/:exercise_id/equipment/:equipmentid', (req, res) => {
 });
 

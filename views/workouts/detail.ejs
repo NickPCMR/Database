@@ -1,28 +1,97 @@
 <div class="row">
   <div class="col-6 offset-3">
     <h1>Workout</h1>
-    <p>July 18th, 2021</p>
-    <a href="/workouts/1/edit">Edit workout details</a>
+    <p><%= locals.workout.date.toDateString() %></p>
+    <p><%= locals.workout.description %></p>
+    <a href="/workouts/<%= locals.workout.workoutID %>/edit">Edit workout details</a>
+    <button class="btn btn-danger" id="deleteWorkout">Delete Workout</button>
     
-    <div class="mb-3">
-      <select class="form-select form-select-lg mb-3" aria-label="Add Exercise" id="add-exercise">
-        <option selected>Add an exercise</option>
-        <option value="3">Leg Press</option>
-        <option value="4">Push Up</option>
-      </select>
-      <form id="add-exercise" action="/workouts/1/exercises" method="post">
+    <h3>Add Exercise</h3>
+    <form action="/workouts/<%= locals.workout.workoutID %>/exercises" method="post" class="validated-form">
+      <div class="mb-3">
+        <select class="form-select form-select-lg mb-3" aria-label="Add Exercise" name="exerciseId">
+          <option selected>Select an exercise to add</option>
+          <% locals.allExercises.forEach((exercise) => { %>
+              <option value="<%= exercise.exerciseID %>">
+                  <%= exercise.name %>
+              </option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="mb-3">
         <button type="submit" class="btn btn-success">Add</button>
-      </form>
-    </div>
+      </div>
+    </form>
+    
     <a href="/exercises/new">Create new exercise</a>
   
     <h3>Exercises:</h3>
 
     <ul>
-      <!-- These remove buttons will have to call a function to delete the relationship
-      and then remove the li -->
-      <li><a href="/exercises/1">Bench Press</a> <button type="button" class="btn btn-danger" name="remove-exercise" id="1">Remove</button></li>
-      <li><a href="/exercises/2">Shoulder Press</a> <button type="button" class="btn btn-danger" name="remove-exercise" id="2">Remove</button></li>
+      <% if(locals.workoutExercises.length > 0) { %>
+        <% locals.workoutExercises.forEach((exercise) => { %>
+          <li>
+            <a href="/exercises/<%= exercise.exerciseID %>"><%= exercise.name %></a>
+            <button type="button" class="btn btn-danger" name="remove-exercise" id="<%= exercise.exerciseID %>">Remove</button>
+          </li>
+        <% }); %>
+      <% } else { %>
+        <p>Workout has no exercises</p>
+      <% } %>
     </ul>
   </div>
 </div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', (_event) => {
+    document.getElementById("deleteWorkout").addEventListener("click", () => {
+      deleteWorkout(<%= locals.workout.workoutID %>).then(_res => {
+        window.location.href = `/workouts?success=${encodeURIComponent('Workout deleted successfully')}`;
+      }).catch(error => { console.log(error); });
+    });
+    
+    function deleteWorkout(workoutID) {
+      const req = new XMLHttpRequest();
+      
+      return new Promise((resolve, reject) => {
+        let url = `/workouts/${workoutID}`;
+        req.open('DELETE', url, true);
+        req.addEventListener('load', () => {
+            if(req.status >= 200 && req.status < 400) {
+                resolve();
+            }
+            else {
+                reject("Something went wrong");
+            }
+        });
+        req.send(null);
+      });
+    }
+    
+    <% locals.workoutExercises.forEach((exercise) => { %>
+      document.getElementById("<%= exercise.exerciseID %>").addEventListener("click", () => {
+        deleteWorkoutExercise(<%= exercise.exerciseID %>).then(_res => {
+          window.location.href = `/workouts/<%= locals.workout.workoutID %>?success=${encodeURIComponent('Exercise removed successfully')}`;
+        }).catch(error => { console.log(error); });
+      });
+    <% }); %>
+    
+    function deleteWorkoutExercise(exerciseID) {
+      const req = new XMLHttpRequest();
+      
+      return new Promise((resolve, reject) => {
+        let url = `/workouts/<%= locals.workout.workoutID %>/exercises/${exerciseID}`;
+        req.open('DELETE', url, true);
+        req.addEventListener('load', () => {
+            if(req.status >= 200 && req.status < 400) {
+                resolve();
+            }
+            else {
+                reject("Something went wrong");
+            }
+        });
+        req.send(null);
+      });
+    }
+  });
+</script>
