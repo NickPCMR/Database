@@ -10,12 +10,13 @@
   "author": "Matthew Yang & Nicholas Osborne",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "ejs": "^3.1.6",
     "ejs-mate": "^3.0.0",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.1",
-    "express-session": "^1.17.2",
-    "forever": "^4.0.1"
+    "forever": "^4.0.1",
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"
