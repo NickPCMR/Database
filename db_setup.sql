@@ -20,6 +20,7 @@ CREATE TABLE Workouts (
     `date` DATE NOT NULL,
     `description` VARCHAR(255),
     userID INT(11) NOT NULL,
+    `description` varchar(255),
     PRIMARY KEY (workoutID),
     FOREIGN KEY (userID)
         REFERENCES Users (userID)
@@ -35,15 +36,17 @@ CREATE TABLE Categories (
 CREATE TABLE Equipment (
     equipmentID INT(11) AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL UNIQUE,
-    `description` VARCHAR(255),
     PRIMARY KEY (equipmentID)
 ) ENGINE = InnoDB;
 
 CREATE TABLE Exercises (
     exerciseID INT(11) AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL UNIQUE,
-    `description` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (exerciseID)
+    categoryID int(11),
+    PRIMARY KEY (exerciseID),
+    FOREIGN KEY (categoryID)
+    REFERENCES Categories (categoryID)
+    ON DELETE SET NULL
 ) ENGINE = InnoDB;
 
 CREATE TABLE WorkoutsExercises (
@@ -67,25 +70,35 @@ INSERT INTO Users (email, firstName, lastName) VALUES
 ('osbornic@oregonstate.edu', 'Nick', 'Osborne'), 
 ('yangmat@oregonstate.edu','Matt','Yang');
 
-INSERT INTO Exercises (name, description) VALUES
-('Bench Press', 'A lift or exercise in which a weight is raised by extending the arms upward while lying on a bench'),
-('Squat', 'An exercise in which a standing person lowers to a position in which the torso is erect and the knees are deeply bent and then rises to an upright position'),
-('Push Up', 'A conditioning exercise performed in a prone position by raising and lowering the body with the straightening and bending of the arms while keeping the back straight and supporting the body on the hands and toes'),
-('Pull Up','An exercise in which one hangs by the hands from a support (such as a horizontal bar) and pulls oneself up until the chin is level with the support'),
-('Dead Lift', 'A lift in weight lifting in which the weight is lifted from the floor to hip level' ),
-('Dip', 'A bodyweight exercise executed by grasping two parallel bars and lowering/raising the body by bending the elbows'),
-('Overhead Press','A strength exercise in which a weight is pressed straight upwards from a racking position until the arms are locked out overhead');
+INSERT INTO Categories (name) VALUES
+('Strength'),
+('Calisthenics'),
+('Cardio'),
+('Flexibility');
 
-INSERT INTO Equipment (name, description) VALUES
-('barbell','A long metal bar to which disks of varying weights are attached at each end, used for weightlifting'),
-('dumbbell','A short bar with a weight at each end, used typically in pairs for exercise or muscle-building'),
-('pull up bar', 'A suspended horizontal bar from which one can perform a pull up exercise'),
-('squat rack','A metal rack or cage consisting of support pillars with adjustable bars and hooks, using for supporting a barbell during heavy weightlifting exercises'),
-('bench','A low, usually padded platform used in weight lifting'),
-('yoga ball','A large ball for sitting or lying on while exercising'),
-('yoga mat','A specially fabricated mat used to prevent hands and feet slipping while performing yoga'),
-('rowing machine', 'An exercise machine with a sliding seat that mimics the motions of rowing a boat'),
-('kettlebell','A large cast-iron ball-shaped weight with a single handle');
+INSERT INTO Exercises (name, categoryID) VALUES
+('Bench Press',1),
+('Squat', 1),
+('Push Up', 2),
+('Pull Up', 2),
+('Dead Lift', 1),
+('Dip', 2),
+('Overhead Press', 1),
+('Running', 3),
+('Swimming',3),
+('Yoga',4),
+('Stretching',4);
+
+INSERT INTO Equipment (name) VALUES
+('barbell'),
+('dumbbell'),
+('pull up bar'),
+('squat rack'),
+('bench'),
+('yoga ball'),
+('yoga mat'),
+('rowing machine'),
+('kettlebell');
 
 INSERT INTO Workouts (date, description, userID) VALUES
 ('2021-08-21','Bench Press 150 lbs',1),
