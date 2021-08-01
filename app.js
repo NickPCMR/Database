@@ -8,7 +8,7 @@ const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const ejsMate = require('ejs-mate');
 const path = require('path');
-const db = require('./databse/db-connector');
+const db = require('./database/db-connector');
 
 const app = express();
 PORT = process.env.PORT || 3000;
