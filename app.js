@@ -826,7 +826,10 @@ app.get('/equipment', (req, res) => {
 
 // Equipment new
 app.get('/equipment/new', (req, res) => {
-
+    let data = { locals: {} };
+    if (req.query.error) {
+        data.locals.error = req.query.error;
+    }
     res.render('equipment/new');
 });
 
@@ -841,6 +844,10 @@ app.post('/equipment/new', (req, res) => {
             if (!error) {
                 const equipmentId = results.insertId;
                 res.redirect(`/equipment/${equipmentId}?success=${encodeURIComponent('Equipment created successfully')}`)
+            } else if (error.message.match(/Duplicate entry/)) {
+                res.status(400);
+                res.data.locals.error = 'Equipment name already taken';
+                res.render('equipment/new');
             } else {
                 data.locals.error = error;
                 res.status(500);
@@ -902,6 +909,7 @@ app.get('/equipment/:equipment_id/edit', (req, res) => {
             data.locals.equipment = rows[0]
 
             res.render('equipment/edit', data);
+            
         } else {
             data.locals.error = error;
             res.status(500);
@@ -981,25 +989,11 @@ app.get('/categories', (req, res) => {
 // Categories new
 app.get('/categories/new', (req, res) => {
     let data = { locals: {} };
-    const name = req.body.name;
-
-    if (name) {
-        category_create_query = queries.categories.create;
-
-        db.pool.query(category_create_query, name, (error, results, fields) => {
-            if (!error) {
-                const categoryId = results.insertId;
-                res.redirect(`/categories/${categoryId}?success=${encodeURIComponent('Category created successfully')}`)
-            } else {
-                data.locals.error = error;
-                res.status(500);
-                res.render('500', data);
-            }
-        });
-    } else {
-        res.status(400);
-        res.render('categories/new', { locals: { error: 'Name is required' } });
+    if (req.query.error) {
+        data.locals.error = req.query.error;
     }
+
+    res.render('categories/new', data);
 });
 
 app.post('/categories/new', (req, res) => {
