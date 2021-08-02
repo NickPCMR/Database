@@ -53,15 +53,15 @@ app.post('/search', (req, res) => {
 // Users index
 app.get('/users', (req, res) => {
     let data = { locals: {} };
-    if(req.query.success) {
+    if (req.query.success) {
         data.locals.success = req.query.success;
     }
-    
+
     users_query = queries.users.select_all;
-    
+
     db.pool.query(users_query, (error, rows, _fields) => {
         data.locals.users = rows;
-        
+
         res.render('users/index', data);
     });
 });
@@ -73,22 +73,22 @@ app.get('/users/new', (req, res) => {
 
 app.post('/users/new', (req, res) => {
     let data = { locals: {} };
-    if(req.query.error) {
+    if (req.query.error) {
         data.locals.error = req.query.error;
     }
-    
+
     const email = req.body.email;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    
-    if(email && firstName && lastName) {
+
+    if (email && firstName && lastName) {
         create_query = queries.users.create;
-        
+
         db.pool.query(create_query, [email, firstName, lastName], (error, results, _fields) => {
-            if(!error) {
+            if (!error) {
                 const userId = results.insertId;
                 res.redirect(`/users/${userId}?success=${encodeURIComponent('User created successfully')}`);
-            } else if(error.message.match(/Duplicate entry/)){
+            } else if (error.message.match(/Duplicate entry/)) {
                 res.status(400);
                 data.locals.error = "Email is already taken.";
                 res.render('users/new', data);
@@ -107,24 +107,24 @@ app.post('/users/new', (req, res) => {
 // Users detail
 app.get('/users/:user_id', (req, res, next) => {
     let data = { locals: {} };
-    if(req.query.success) {
+    if (req.query.success) {
         data.locals.success = req.query.success;
     }
-    
+
     const userId = req.params.user_id;
-    
+
     user_query = queries.users.find_by_id;
     workouts_query = queries.workouts.by_user_id;
-    
+
     db.pool.query(user_query, [userId], (error, rows, _fields) => {
-        if(!error) {
-            if(rows.length > 0) {
+        if (!error) {
+            if (rows.length > 0) {
                 data.locals.user = rows[0];
-                
+
                 db.pool.query(workouts_query, [userId], (error, rows, _fields) => {
-                    if(!error) {
+                    if (!error) {
                         data.locals.workouts = rows;
-                        
+
                         res.render('users/detail', data);
                     } else {
                         data.locals.error = error;
@@ -147,16 +147,16 @@ app.get('/users/:user_id', (req, res, next) => {
 // Users edit
 app.get('/users/:user_id/edit', (req, res) => {
     let data = { locals: {} };
-    
+
     const userId = req.params.user_id;
-    
+
     user_query = queries.users.find_by_id;
-    
+
     db.pool.query(user_query, [userId], (error, rows, _fields) => {
-        if(!error) {
-            if(rows.length > 0) {
+        if (!error) {
+            if (rows.length > 0) {
                 data.locals.user = rows[0];
-                
+
                 res.render('users/edit', data);
             } else {
                 res.status(404);
@@ -172,29 +172,29 @@ app.get('/users/:user_id/edit', (req, res) => {
 
 app.post('/users/:user_id/edit', (req, res) => {
     let data = { locals: {} };
-    
+
     const userId = req.params.user_id;
-    
+
     const email = req.body.email;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    
+
     const userData = {
         userID: userId,
         email: email,
         firstName: firstName,
         lastName: lastName
     };
-    
-    if(email && firstName && lastName) {
+
+    if (email && firstName && lastName) {
         user_edit_query = queries.users.edit_by_id;
-        
+
         db.pool.query(user_edit_query, [email, firstName, lastName, userId], (error, rows, _fields) => {
-            if(!error) {
+            if (!error) {
                 find_by_id_query = queries.users.find_by_id;
-                
+
                 db.pool.query(find_by_id_query, [userId], (error, rows, _fields) => {
-                    if(!error) {
+                    if (!error) {
                         res.redirect(`/users/${rows[0].userID}?success=${encodeURIComponent('User updated successfully')}`);
                     } else {
                         data.locals.error = error;
@@ -202,7 +202,7 @@ app.post('/users/:user_id/edit', (req, res) => {
                         res.render('500', data);
                     }
                 });
-            } else if(error.message.match(/Duplicate entry/)){
+            } else if (error.message.match(/Duplicate entry/)) {
                 res.status(400);
                 data.locals.error = "Email is already taken.";
                 data.locals.user = userData;
@@ -225,11 +225,11 @@ app.post('/users/:user_id/edit', (req, res) => {
 app.delete('/users/:user_id', (req, res) => {
     let data = { locals: {} };
     const userId = req.params.user_id;
-    
+
     user_delete_query = queries.users.delete_by_id;
-    
+
     db.pool.query(user_delete_query, [userId], (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             res.sendStatus(204);
         } else {
             data.locals.error = error;
@@ -246,14 +246,14 @@ app.delete('/users/:user_id', (req, res) => {
 // Workouts index
 app.get('/workouts', (req, res) => {
     let data = { locals: {} };
-    if(req.query.success) {
+    if (req.query.success) {
         data.locals.success = req.query.success;
     }
-    
+
     workouts_query = queries.workouts.select_all_with_users;
-    
+
     db.pool.query(workouts_query, (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             data.locals.workouts = rows;
             res.render('workouts/index', data);
         } else {
@@ -267,12 +267,12 @@ app.get('/workouts', (req, res) => {
 // Workouts new
 app.get('/workouts/new', (req, res) => {
     let data = { locals: {} };
-    
+
     users_query = queries.users.select_all;
-    
+
     db.pool.query(users_query, (error, rows, _fields) => {
-        if(!error) {
-            if(rows.length > 0) {
+        if (!error) {
+            if (rows.length > 0) {
                 data.locals.users = rows;
                 res.render('workouts/new', data);
             } else {
@@ -288,16 +288,16 @@ app.get('/workouts/new', (req, res) => {
 
 app.post('/workouts/new', (req, res) => {
     let data = { locals: {} };
-    
+
     const userId = req.body.userId;
     const date = req.body.date;
     const description = req.body.description;
-    
-    if(userId && date) {
+
+    if (userId && date) {
         workouts_create_query = queries.workouts.create;
-        
+
         db.pool.query(workouts_create_query, [userId, date, description], (error, results, fields) => {
-            if(!error) {
+            if (!error) {
                 const workoutId = results.insertId;
                 res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Workout created successfully')}`);
             } else {
@@ -315,11 +315,11 @@ app.post('/workouts/new', (req, res) => {
 // Workouts detail
 app.get('/workouts/:workout_id', (req, res) => {
     let data = { locals: {} };
-    if(req.query.success) {
+    if (req.query.success) {
         data.locals.success = req.query.success;
     }
-    
-    if(req.query.error) {
+
+    if (req.query.error) {
         data.locals.error = req.query.error;
     }
 
@@ -328,22 +328,22 @@ app.get('/workouts/:workout_id', (req, res) => {
     workout_query = queries.workouts.find_by_id;
 
     db.pool.query(workout_query, [workoutId], (error, rows, _fields) => {
-        if(!error) {
-            if(rows.length > 0) {
+        if (!error) {
+            if (rows.length > 0) {
                 data.locals.workout = rows[0];
-                
+
                 exercises_by_workout_query = queries.exercises.by_workout_id;
-                
+
                 db.pool.query(exercises_by_workout_query, [workoutId], (error, rows, _fields) => {
-                    if(!error) {
+                    if (!error) {
                         data.locals.workoutExercises = rows;
-                        
+
                         all_exercises_query = queries.exercises.select_all;
-                        
+
                         db.pool.query(all_exercises_query, (error, rows, _fields) => {
-                            if(!error) {
+                            if (!error) {
                                 data.locals.allExercises = rows;
-                                
+
                                 res.render('workouts/detail', data);
                             } else {
                                 data.locals.error = error;
@@ -372,7 +372,7 @@ app.get('/workouts/:workout_id', (req, res) => {
 // Workouts edit
 app.get('/workouts/:workout_id/edit', (req, res) => {
     let data = { locals: {} };
-    if(req.query.error) {
+    if (req.query.error) {
         data.locals.error = req.query.error;
     }
 
@@ -381,28 +381,28 @@ app.get('/workouts/:workout_id/edit', (req, res) => {
     workout_query = queries.workouts.find_by_id;
 
     db.pool.query(workout_query, [workoutId], (error, rows, _fields) => {
-        if(!error) {
-            if(rows.length > 0) {
+        if (!error) {
+            if (rows.length > 0) {
                 data.locals.workout = rows[0];
                 let year = data.locals.workout.date.getFullYear();
                 let day = data.locals.workout.date.getDate();
                 let month = data.locals.workout.date.getMonth() + 1;
-                
-                if(day < 10) {
+
+                if (day < 10) {
                     day = `0${day}`;
                 }
-                
-                if(month < 10) {
+
+                if (month < 10) {
                     month = `0${month}`
                 }
-                
+
                 const formattedDate = `${year}-` + `${month}-` + `${day}`;
                 data.locals.workout.formattedDate = formattedDate;
-                
+
                 users_query = queries.users.select_all;
-                
+
                 db.pool.query(users_query, (error, rows, _fields) => {
-                    if(!error) {
+                    if (!error) {
                         data.locals.users = rows;
                         res.render('workouts/edit', data);
                     } else {
@@ -425,17 +425,17 @@ app.get('/workouts/:workout_id/edit', (req, res) => {
 
 app.post('/workouts/:workout_id/edit', (req, res) => {
     let data = { locals: {} };
-    
+
     const workoutId = req.params.workout_id;
     const userId = req.body.userId;
     const date = req.body.date;
     const description = req.body.description;
-    
-    if(userId && date) {
+
+    if (userId && date) {
         workout_edit_query = queries.workouts.edit_by_id;
-        
+
         db.pool.query(workout_edit_query, [date, description, userId, workoutId], (error, results, fields) => {
-            if(!error) {
+            if (!error) {
                 res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Workout updated successfully')}`);
             } else {
                 data.locals.error = error;
@@ -452,17 +452,17 @@ app.post('/workouts/:workout_id/edit', (req, res) => {
 // Add exercise to workout
 app.post('/workouts/:workout_id/exercises', (req, res) => {
     let data = { locals: {} };
-    
+
     const workoutId = req.params.workout_id;
     const exerciseId = req.body.exerciseId;
-    
-    if(workoutId && exerciseId) {
+
+    if (workoutId && exerciseId) {
         add_exercise_query = queries.exercises.add_to_workout;
-        
+
         db.pool.query(add_exercise_query, [workoutId, exerciseId], (error, results, fields) => {
-            if(!error) {
+            if (!error) {
                 res.redirect(`/workouts/${workoutId}?success=${encodeURIComponent('Exercise added successfully')}`);
-            } else if(error.message.match(/Duplicate entry/)){
+            } else if (error.message.match(/Duplicate entry/)) {
                 res.status(400);
                 res.redirect(`/workouts/${workoutId}?error=${encodeURIComponent('Exercise already added to workout')}`);
             } else {
@@ -482,11 +482,11 @@ app.delete('/workouts/:workout_id/exercises/:exercise_id', (req, res) => {
     let data = { locals: {} };
     const workoutId = req.params.workout_id;
     const exerciseId = req.params.exercise_id;
-    
+
     remove_exercise_query = queries.exercises.remove_from_workout;
-    
+
     db.pool.query(remove_exercise_query, [workoutId, exerciseId], (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             res.sendStatus(204);
         } else {
             data.locals.error = error;
@@ -500,11 +500,11 @@ app.delete('/workouts/:workout_id/exercises/:exercise_id', (req, res) => {
 app.delete('/workouts/:workout_id', (req, res) => {
     let data = { locals: {} };
     const workoutId = req.params.workout_id;
-    
+
     workout_delete_query = queries.workouts.delete_by_id;
-    
+
     db.pool.query(workout_delete_query, [workoutId], (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             res.sendStatus(204);
         } else {
             data.locals.error = error;
@@ -521,14 +521,14 @@ app.delete('/workouts/:workout_id', (req, res) => {
 // Exercises index
 app.get('/exercises', (req, res) => {
     let data = { locals: {} };
-    if(req.query.success) {
+    if (req.query.success) {
         data.locals.success = req.query.success;
     }
-    
+
     exercises_query = queries.exercises.select_all;
-    
+
     db.pool.query(exercises_query, (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             data.locals.exercises = rows;
             res.render('exercises/index', data);
         } else {
@@ -542,11 +542,11 @@ app.get('/exercises', (req, res) => {
 // Exercises new
 app.get('/exercises/new', (req, res) => {
     let data = { locals: {} };
-    
+
     categories_query = queries.categories.select_all;
-    
+
     db.pool.query(categories_query, (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             data.locals.categories = rows;
             res.render('exercises/new', data);
         } else {
@@ -559,19 +559,19 @@ app.get('/exercises/new', (req, res) => {
 
 app.post('/exercises/new', (req, res) => {
     let data = { locals: {} };
-    
+
     const name = req.body.name;
     let categoryId = req.body.categoryId;
-    
-    if(categoryId == 'NULL') {
+
+    if (categoryId == 'NULL') {
         categoryId = null;
     }
-    
-    if(name) {
+
+    if (name) {
         exercises_create_query = queries.exercises.create;
-        
+
         db.pool.query(exercises_create_query, [name, categoryId], (error, results, fields) => {
-            if(!error) {
+            if (!error) {
                 const exerciseId = results.insertId;
                 res.redirect(`/exercises/${exerciseId}?success=${encodeURIComponent('Exercise created successfully')}`);
             } else {
@@ -589,11 +589,11 @@ app.post('/exercises/new', (req, res) => {
 // Exercises detail
 app.get('/exercises/:exercise_id', (req, res) => {
     let data = { locals: {} };
-    if(req.query.success) {
+    if (req.query.success) {
         data.locals.success = req.query.success;
     }
-    
-    if(req.query.error) {
+
+    if (req.query.error) {
         data.locals.error = req.query.error;
     }
 
@@ -602,28 +602,28 @@ app.get('/exercises/:exercise_id', (req, res) => {
     exercise_query = queries.exercises.find_by_id;
 
     db.pool.query(exercise_query, [exerciseId], (error, rows, _fields) => {
-        if(!error) {
-            if(rows.length > 0) {
+        if (!error) {
+            if (rows.length > 0) {
                 data.locals.exercise = rows[0];
-                
+
                 equipment_by_exercise_query = queries.equipment.by_exercise_id;
-                
+
                 db.pool.query(equipment_by_exercise_query, [exerciseId], (error, rows, _fields) => {
-                    if(!error) {
+                    if (!error) {
                         data.locals.exerciseEquipment = rows;
-                        
+
                         all_equipment_query = queries.equipment.select_all;
-                        
+
                         db.pool.query(all_equipment_query, (error, rows, _fields) => {
-                            if(!error) {
+                            if (!error) {
                                 data.locals.allEquipment = rows;
-                                
-                                if(data.locals.exercise.categoryID) {
+
+                                if (data.locals.exercise.categoryID) {
                                     categoryId = data.locals.exercise.categoryID;
                                     category_query = queries.categories.find_by_id;
-                                    
+
                                     db.pool.query(category_query, [categoryId], (error, rows, _fields) => {
-                                        if(!error) {
+                                        if (!error) {
                                             data.locals.exercise.categoryName = rows[0].name;
                                             res.render('exercises/detail', data);
                                         } else {
@@ -662,11 +662,11 @@ app.get('/exercises/:exercise_id', (req, res) => {
 // Exercises edit
 app.get('/exercises/:exercise_id/edit', (req, res) => {
     let data = { locals: {} };
-    if(req.query.success) {
+    if (req.query.success) {
         data.locals.success = req.query.success;
     }
-    
-    if(req.query.error) {
+
+    if (req.query.error) {
         data.locals.error = req.query.error;
     }
 
@@ -675,14 +675,14 @@ app.get('/exercises/:exercise_id/edit', (req, res) => {
     exercise_query = queries.exercises.find_by_id;
 
     db.pool.query(exercise_query, [exerciseId], (error, rows, _fields) => {
-        if(!error) {
-            if(rows.length > 0) {
+        if (!error) {
+            if (rows.length > 0) {
                 data.locals.exercise = rows[0];
-                
+
                 categories_query = queries.categories.select_all;
-                
+
                 db.pool.query(categories_query, (error, rows, _fields) => {
-                    if(!error) {
+                    if (!error) {
                         data.locals.categories = rows;
                         res.render('exercises/edit', data);
                     } else {
@@ -705,20 +705,20 @@ app.get('/exercises/:exercise_id/edit', (req, res) => {
 
 app.post('/exercises/:exercise_id/edit', (req, res) => {
     let data = { locals: {} };
-    
+
     const exerciseId = req.params.exercise_id;
     const name = req.body.name;
     let categoryId = req.body.categoryId;
-    
-    if(categoryId == 'NULL') {
+
+    if (categoryId == 'NULL') {
         categoryId = null;
     }
-    
-    if(name) {
+
+    if (name) {
         exercises_update_query = queries.exercises.edit_by_id;
-        
+
         db.pool.query(exercises_update_query, [name, categoryId, exerciseId], (error, results, fields) => {
-            if(!error) {
+            if (!error) {
                 res.redirect(`/exercises/${exerciseId}?success=${encodeURIComponent('Exercise updated successfully')}`);
             } else {
                 data.locals.error = error;
@@ -735,17 +735,17 @@ app.post('/exercises/:exercise_id/edit', (req, res) => {
 // Add equipment to exercise
 app.post('/exercises/:exercise_id/equipment', (req, res) => {
     let data = { locals: {} };
-    
+
     const exerciseId = req.params.exercise_id;
     const equipmentId = req.body.equipmentId;
-    
-    if(exerciseId && equipmentId) {
+
+    if (exerciseId && equipmentId) {
         add_equipment_query = queries.equipment.add_to_exercise;
-        
+
         db.pool.query(add_equipment_query, [exerciseId, equipmentId], (error, results, fields) => {
-            if(!error) {
+            if (!error) {
                 res.redirect(`/exercises/${exerciseId}?success=${encodeURIComponent('Equipment added successfully')}`);
-            } else if(error.message.match(/Duplicate entry/)){
+            } else if (error.message.match(/Duplicate entry/)) {
                 res.status(400);
                 res.redirect(`/exercises/${exerciseId}?error=${encodeURIComponent('Equipment already added to exercise')}`);
             } else {
@@ -763,14 +763,14 @@ app.post('/exercises/:exercise_id/equipment', (req, res) => {
 // Remove equipment from exercise
 app.delete('/exercises/:exercise_id/equipment/:equipment_id', (req, res) => {
     let data = { locals: {} };
-    
+
     const exerciseId = req.params.exercise_id;
     const equipmentId = req.params.equipment_id;
-    
+
     remove_equipment_query = queries.equipment.remove_from_exercise;
-    
+
     db.pool.query(remove_equipment_query, [exerciseId, equipmentId], (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             res.sendStatus(204);
         } else {
             data.locals.error = error;
@@ -785,11 +785,11 @@ app.delete('/exercises/:exercise_id/equipment/:equipment_id', (req, res) => {
 app.delete('/exercises/:exercise_id', (req, res) => {
     let data = { locals: {} };
     const exerciseId = req.params.exercise_id;
-    
+
     exercise_delete_query = queries.exercises.delete_by_id;
-    
+
     db.pool.query(exercise_delete_query, [exerciseId], (error, rows, _fields) => {
-        if(!error) {
+        if (!error) {
             res.sendStatus(204);
         } else {
             data.locals.error = error;
@@ -805,30 +805,152 @@ app.delete('/exercises/:exercise_id', (req, res) => {
 
 // Equipment index
 app.get('/equipment', (req, res) => {
-    res.render('equipment/index');
+    let data = { locals: {} };
+    if (req.query.success) {
+        data.locals.success = req.query.success;
+    }
+
+    equipment_query = queries.equipment.select_all;
+
+    db.pool.query(equipment_query, (error, rows, _fields) => {
+        if (!error) {
+            data.locals.equipment = rows;
+            res.render('equipment/index', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    })
 });
 
 // Equipment new
 app.get('/equipment/new', (req, res) => {
+
     res.render('equipment/new');
 });
 
 app.post('/equipment/new', (req, res) => {
-    res.redirect('/equipment/1');
+    let data = { locals: {} };
+    const name = req.body.name;
+
+    if (name) {
+        equipment_create_query = queries.equipment.create;
+
+        db.pool.query(equipment_create_query, name, (error, results, fields) => {
+            if (!error) {
+                const equipmentId = results.insertId;
+                res.redirect(`/equipment/${equipmentId}?success=${encodeURIComponent('Equipment created successfully')}`)
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.render('equipment/new', { locals: { error: 'Name is required' } });
+    }
+
 });
 
 // Equipment detail
 app.get('/equipment/:equipment_id', (req, res) => {
-    res.render('equipment/detail');
+    let data = { locals: {} };
+    if (req.query.success) {
+        data.locals.success = req.query.success;
+    }
+
+    if (req.query.error) {
+        data.locals.error = req.query.error;
+    }
+
+    const equipmentId = req.params.equipment_id;
+
+    equipment_query = queries.equipment.find_by_id;
+
+    db.pool.query(equipment_query, equipmentId, (error, rows, _fields) => {
+        if (!error) {
+            data.locals.equipment = rows[0]
+
+            res.render('equipment/detail', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    })
 });
 
 // Equipment edit
 app.get('/equipment/:equipment_id/edit', (req, res) => {
-    res.render('equipment/edit');
+    let data = { locals: {} };
+    if (req.query.success) {
+        data.locals.success = req.query.success;
+    }
+
+    if (req.query.error) {
+        data.locals.error = req.query.error;
+    }
+
+    const equipmentId = req.params.equipment_id;
+
+    equipment_query = queries.equipment.find_by_id;
+
+    db.pool.query(equipment_query, equipmentId, (error, rows, _fields) => {
+        if (!error) {
+            data.locals.equipment = rows[0]
+
+            res.render('equipment/edit', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    })
 });
 
-app.post('/equipment/:equipment_id', (req, re) => {
-    res.redirect('/equipment/1');
+app.post('/equipment/:equipment_id/edit', (req, res) => {
+
+    let data = { locals: {} };
+
+    const equipmentId = req.params.equipment_id;
+    const name = req.body.name;
+
+    if (name) {
+        equipment_update_query = queries.equipment.edit_by_id;
+
+        db.pool.query(equipment_update_query, [name, equipmentId], (errors, results, fields) => {
+            if (!errors) {
+                res.redirect(`/equipment/${equipmentId}?succes=${encodeURIComponent('Equipment updated successfully')}`)
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.redirect(`/equipment/${equipmentId}/edit?error=${encodeURIComponent('Name is required')}`);
+    }
+
+});
+
+app.delete('/equipment/:equipment_id', (req, res) => {
+    let data = { locals: {} };
+    const equipmentId = req.params.equipment_id;
+
+    equipment_delete_query = queries.equipment.delete_by_id;
+
+    db.pool.query(equipment_delete_query, equipmentId, (error, rows, _fields) => {
+        if (!error) {
+            res.sendStatus(204);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 ////////////////

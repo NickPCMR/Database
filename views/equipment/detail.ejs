@@ -1,7 +1,37 @@
 <div class="row">
   <div class="col-6 offset-3">
-    <h1>Barbell</h1>
-    <p>A barbell is a piece of exercise equipment used in weight training, bodybuilding, weightlifting and powerlifting, consisting of a long bar, usually with weights attached at each end.</p>
-    <a href="/equipment/1/edit">Edit equipment details</a>
+    <h1>
+      <%= locals.equipment.name %>
+    </h1>
+    <a href="/equipment/<%= locals.equipment.equipmentID %> /edit">Edit equipment</a>
+    <button class="btn btn-danger" id="deleteEquipment">Delete</button>
   </div>
 </div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', (_event) => {
+    document.getElementById("deleteEquipment").addEventListener("click", () => {
+      deleteEquipment(<%= locals.equipment.equipmentID %>).then(_res => {
+        window.location.href = `/equipment?success=${encodeURIComponent('equipment deleted successfully')}`;
+      }).catch(error => { console.log(error); });
+    });
+
+    function deleteEquipment(equipmentID) {
+      const req = new XMLHttpRequest();
+
+      return new Promise((resolve, reject) => {
+        let url = `/equipment/${equipmentID}`;
+        req.open('DELETE', url, true);
+        req.addEventListener('load', () => {
+          if (req.status >= 200 && req.status < 400) {
+            resolve();
+          }
+          else {
+            reject("Something went wrong");
+          }
+        });
+        req.send(null);
+      });
+    }
+  });
+</script>

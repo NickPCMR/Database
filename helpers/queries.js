@@ -27,12 +27,14 @@ exports.queries = {
     create: 'INSERT INTO Exercises(name, categoryID) VALUES (?, ?)'
   },
   equipment: {
+    create: ' INSERT INTO Equipment (name) values (?)',
     select_all: 'SELECT equipmentID, name FROM Equipment',
-    find_by_id: '',
+    find_by_id: 'SELECT equipmentID, name FROM Equipment WHERE equipmentID = ?',
     by_exercise_id: 'SELECT Equipment.name, Equipment.equipmentID FROM Equipment JOIN ExercisesEquipment ON Equipment.equipmentID = ExercisesEquipment.equipmentID JOIN Exercises ON ExercisesEquipment.exerciseID = Exercises.exerciseID WHERE Exercises.exerciseID = ?',
-    delete_by_id: '',
+    delete_by_id: 'DELETE FROM Equipment WHERE equipmentID = ?',
     add_to_exercise: 'INSERT INTO ExercisesEquipment(exerciseID, equipmentID) VALUES (?, ?)',
-    remove_from_exercise: 'DELETE FROM ExercisesEquipment WHERE exerciseID = ? AND equipmentID = ?'
+    remove_from_exercise: 'DELETE FROM ExercisesEquipment WHERE exerciseID = ? AND equipmentID = ?',
+    edit_by_id: 'UPDATE Equipment SET name = ? WHERE equipmentID = ?'
   },
   categories: {
     select_all: 'SELECT categoryID, name FROM Categories',
