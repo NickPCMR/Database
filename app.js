@@ -959,30 +959,167 @@ app.delete('/equipment/:equipment_id', (req, res) => {
 
 // Categories index
 app.get('/categories', (req, res) => {
-    res.render('categories/index');
+    let data = { locals: {} };
+    if (req.query.success) {
+        data.locals.success = req.query.success;
+    }
+
+    category_query = queries.categories.select_all;
+
+    db.pool.query(category_query, (error, rows, _fields) => {
+        if (!error) {
+            data.locals.categories = rows;
+            res.render('categories/index', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    })
 });
 
 // Categories new
 app.get('/categories/new', (req, res) => {
-    res.render('categories/new');
+    let data = { locals: {} };
+    const name = req.body.name;
+
+    if (name) {
+        category_create_query = queries.categories.create;
+
+        db.pool.query(category_create_query, name, (error, results, fields) => {
+            if (!error) {
+                const categoryId = results.insertId;
+                res.redirect(`/categories/${categoryId}?success=${encodeURIComponent('Category created successfully')}`)
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.render('categories/new', { locals: { error: 'Name is required' } });
+    }
 });
 
 app.post('/categories/new', (req, res) => {
-    res.redirect('/categories/1');
+    let data = { locals: {} };
+    const name = req.body.name;
+
+    if (name) {
+        category_create_query = queries.categories.create;
+
+        db.pool.query(category_create_query, name, (error, results, fields) => {
+            if (!error) {
+                const categoryId = results.insertId;
+                res.redirect(`/categories/${categoryId}?success=${encodeURIComponent('Category created successfully')}`)
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.render('categories/new', { locals: { error: 'Name is required' } });
+    }
 });
 
 // Categories detail
 app.get('/categories/:category_id', (req, res) => {
-    res.render('categories/detail');
+    let data = { locals: {} };
+    if (req.query.success) {
+        data.locals.success = req.query.success;
+    }
+
+    if (req.query.error) {
+        data.locals.error = req.query.error;
+    }
+
+    const categoryId = req.params.category_id;
+
+    category_query = queries.categories.find_by_id;
+
+    db.pool.query(category_query, categoryId, (error, rows, _fields) => {
+        if (!error) {
+            data.locals.categories = rows[0]
+
+            res.render('categories/detail', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    })
 });
 
 // Categories edit
 app.get('/categories/:category_id/edit', (req, res) => {
-    res.render('categories/edit');
+    let data = { locals: {} };
+    if (req.query.success) {
+        data.locals.success = req.query.success;
+    }
+
+    if (req.query.error) {
+        data.locals.error = req.query.error;
+    }
+
+    const categoryId = req.params.category_id;
+
+    category_query = queries.categories.find_by_id;
+
+    db.pool.query(category_query, categoryId, (error, rows, _fields) => {
+        if (!error) {
+            data.locals.categories = rows[0]
+
+            res.render('categories/edit', data);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    })
 });
 
 app.post('/categories/:category_id/edit', (req, res) => {
-    res.redirect('/categories/1');
+    let data = { locals: {} };
+
+    const categoryId = req.params.category_id;
+    const name = req.body.name;
+
+    if (name) {
+        category_query = queries.categories.edit_by_id;
+
+        db.pool.query(category_query, [name, categoryId], (errors, results, fields) => {
+            if (!errors) {
+                res.redirect(`/categories/${categoryId}?succes=${encodeURIComponent('Category updated successfully')}`)
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.redirect(`/categories/${categoryId}/edit?error=${encodeURIComponent('Name is required')}`);
+    }
+});
+
+app.delete('/categories/:category_id', (req, res) => {
+    let data = { locals: {} };
+    const categoryId = req.params.category_id;
+
+    category_delete = queries.categories.delete_by_id;
+
+    db.pool.query(category_delete, categoryId, (error, rows, _fields) => {
+        if (!error) {
+            res.sendStatus(204);
+        } else {
+            data.locals.error = error;
+            res.status(500);
+            res.render('500', data);
+        }
+    });
 });
 
 /*

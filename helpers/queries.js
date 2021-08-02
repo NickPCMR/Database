@@ -38,6 +38,9 @@ exports.queries = {
   },
   categories: {
     select_all: 'SELECT categoryID, name FROM Categories',
-    find_by_id: 'SELECT categoryID, name FROM Categories WHERE categoryID = ?'
+    find_by_id: 'SELECT categoryID, name FROM Categories WHERE categoryID = ?',
+    create: 'INSERT INTO Categories (name) VALUES (?)',
+    edit_by_id: 'UPDATE Categories SET name = ? WHERE categoryID = ?',
+    delete_by_id: 'DELETE FROM Categories WHERE categoryID = ?'
   }
 }

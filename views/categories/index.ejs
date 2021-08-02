@@ -1,20 +1,21 @@
-
 <div class="row">
   <div class="col-6 offset-3">
-    <h1>Categories Index</h1>
+    <h1>Category Index</h1>
 
     <a class="btn btn-primary" href="/categories/new">New Category</a>
 
     <ul>
-      <li>
-        <a href="/categories/1">Cardio</a>
-      </li>
-      <li>
-        <a href="/categories/2">Weight Training</a>
-      </li>
-      <li>
-        <a href="/categories/3">Stretching</a>
-      </li>
+      <% if(locals.categories.length> 0) { %>
+        <% locals.categories.forEach((category)=> { %>
+          <li>
+            <a href="/categories/<%= category.categoryID %>">
+              <%= category.name %>
+            </a>
+          </li>
+          <% }); %>
+            <% } else { %>
+              <p>No category found</p>
+              <% } %>
     </ul>
   </div>
 </div>

@@ -1,6 +1,37 @@
 <div class="row">
   <div class="col-6 offset-3">
-    <h1>Weight Traning</h1>
-    <a href="/categories/1/edit">Edit category details</a>
+    <h1>
+      <%= locals.categories.name %>
+    </h1>
+    <a href="/categories/<%= locals.categories.categoryID %> /edit">Edit category</a>
+    <button class="btn btn-danger" id="deleteCategory">Delete</button>
   </div>
 </div>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', (_event) => {
+    document.getElementById("deleteCategory").addEventListener("click", () => {
+      deleteCategory(<%= locals.categories.categoryID %>).then(_res => {
+        window.location.href = `/categories?success=${encodeURIComponent('categories deleted successfully')}`;
+      }).catch(error => { console.log(error); });
+    });
+
+    function deleteCategory(categoryID) {
+      const req = new XMLHttpRequest();
+
+      return new Promise((resolve, reject) => {
+        let url = `/categories/${categoryID}`;
+        req.open('DELETE', url, true);
+        req.addEventListener('load', () => {
+          if (req.status >= 200 && req.status < 400) {
+            resolve();
+          }
+          else {
+            reject("Something went wrong");
+          }
+        });
+        req.send(null);
+      });
+    }
+  });
+</script>
