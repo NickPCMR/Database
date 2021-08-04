@@ -2,12 +2,58 @@
 <div class="row">
     <div class="col-6 offset-3">
         <h1>Search Results</h1>
-        <p>Category: Exercises</p>
-        <p>Search term: press</p>
+        <p>Entity Searched: <%= locals.entityName[0].toUpperCase() + locals.entityName.slice(1) %></p>
+        <p>Search term: <%= locals.searchText %></p>
         
-        <ul>
-            <li><a href="/exercises/1">Bench Press</a></li>
-            <li><a href="/exercises/2">Shoulder Press</a></li>
-        </ul>
+        <div class="mb-3">
+            <% if(locals.results.length == 0) { %>
+                <h3>No matches found</h3>
+            <% } else { %>
+                <h3>Search Results</h3>
+            <% } %>
+            <ul>
+                <% if(locals.entityName == 'users') { %>
+                    <% locals.results.forEach((user) => { %>
+                        <li>
+                            <a href="/users/<%= user.userID%>">
+                                <%= (user.firstName + ' ' + user.lastName + ' - ' + user.email) %>
+                            </a>
+                        </li>
+                    <% }); %>
+                <% } else if(locals.entityName == 'workouts') { %>
+                    <% locals.results.forEach((workout) => { %>
+                        <li>
+                            <a href="/workouts/<%= workout.workoutID%>">
+                                <%= workout.date.toDateString() %>
+                            </a>
+                        </li>
+                    <% }); %>
+                <% } else if(locals.entityName == 'exercises') { %>
+                    <% locals.results.forEach((exercise) => { %>
+                        <li>
+                            <a href="/exercises/<%= exercise.exerciseID%>">
+                                <%= exercise.name %>
+                            </a>
+                        </li>
+                    <% }); %>
+                <% } else if(locals.entityName == 'equipment') { %>
+                    <% locals.results.forEach((equipment) => { %>
+                        <li>
+                            <a href="/equipment/<%= equipment.equipmentID%>">
+                                <%= equipment.name %>
+                            </a>
+                        </li>
+                    <% }); %>
+                <% } else if(locals.entityName == 'categories') { %>
+                    <% locals.results.forEach((category) => { %>
+                        <li>
+                            <a href="/categories/<%= category.categoryID%>">
+                                <%= category.name %>
+                            </a>
+                        </li>
+                    <% }); %>
+                <% } %>
+            </ul>
+        </div
     </div>
 </div>

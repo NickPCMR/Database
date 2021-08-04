@@ -36,14 +36,46 @@ app.get('/', (req, res) => {
 });
 
 // Search
-// TODO
 app.get('/search', (req, res) => {
     res.render('search');
 });
 
-// TODO
 app.post('/search', (req, res) => {
-    res.render('search-results');
+    let data = { locals: {} };
+    if (req.query.error) {
+        data.locals.error = req.query.error;
+    }
+    
+    const entityName = req.body.entityName;
+    const searchText = req.body.searchText;
+    
+    if (entityName && searchText) {
+        let searchArray = [];
+        
+        const fieldsCount = queries[entityName].search.fields_count;
+        
+        for (i = 0; i < fieldsCount; i++) {
+            searchArray.push('%' + searchText + '%');
+        }
+        
+        search_query = queries[entityName].search.query;
+
+        db.pool.query(search_query, searchArray, (error, rows, _fields) => {
+            if (!error) {
+                data.locals.results = rows;
+                data.locals.entityName = entityName;
+                data.locals.searchText = searchText;
+                res.render('search-results', data);
+            } else {
+                data.locals.error = error;
+                res.status(500);
+                res.render('500', data);
+            }
+        });
+    } else {
+        res.status(400);
+        res.render('search', { locals: { error: 'Entity name and search text are required' } });
+    }
 });
 
 ///////////

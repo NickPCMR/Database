@@ -5,15 +5,16 @@
                 <h1>Search</h1>
             </div>
             <div class="mb-3">
-                <select class="form-select form-select-lg mb-3" aria-label="search-category" >
-                    <option selected value="workouts">Workouts</option>
+                <select class="form-select form-select-lg mb-3" aria-label="search-category" name="entityName">
+                    <option selected value="users">Users</option>
+                    <option value="workouts">Workouts</option>
                     <option value="exercises">Exercises</option>
                     <option value="equipment">Equipment</option>
                     <option value="categories">Categories</option>
                 </select>
             </div>
             <div class="mb-3">
-                <input class="form-control" type="text" id="search-text" name="search-text" placeholder="Enter search text" required>
+                <input class="form-control" type="text" id="search-text" name="searchText" placeholder="Enter search text" required>
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-success">Search</button>
