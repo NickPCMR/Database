@@ -6,6 +6,24 @@
     <a class="btn btn-primary" href="/equipment/<%= locals.equipment.equipmentID %> /edit">Edit equipment</a>
     <button class="btn btn-danger" id="deleteEquipment">Delete</button>
   </div>
+  
+  <div class="col-6 offset-3">
+    <h3>Exercises that use this equipment</h3>
+    
+    <ul>
+      <% if(locals.exercises.length > 0) { %>
+        <% locals.exercises.forEach((exercise) => { %>
+          <li>
+            <a href="/exercises/<%= exercise.exerciseID %>">
+              <%= exercise.name %>
+            </a>
+          </li>
+        <% }); %>
+      <% } else { %>
+        <p>No exercises found</p>
+      <% } %>
+    </ul>
+  </div>
 </div>
 
 <script type="text/javascript">

@@ -10,7 +10,7 @@
     <form action="/workouts/<%= locals.workout.workoutID %>/exercises" method="post" class="validated-form">
       <div class="mb-3">
         <select class="form-select form-select-lg mb-3" aria-label="Add Exercise" name="exerciseId">
-          <option selected>Select an exercise to add</option>
+          <option value="null" selected>Select an exercise to add</option>
           <% locals.allExercises.forEach((exercise) => { %>
               <option value="<%= exercise.exerciseID %>">
                   <%= exercise.name %>

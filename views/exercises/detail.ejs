@@ -13,7 +13,7 @@
     <form action="/exercises/<%= locals.exercise.exerciseID %>/equipment" method="post" class="validated-form">
       <div class="mb-3">
         <select class="form-select form-select-lg mb-3" aria-label="Add Equipment" name="equipmentId">
-          <option selected>Add equipment</option>
+          <option value="null" selected>Add equipment</option>
           <% locals.allEquipment.forEach((equipment) => { %>
               <option value="<%= equipment.equipmentID %>">
                   <%= equipment.name %>

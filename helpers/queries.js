@@ -33,6 +33,8 @@ exports.queries = {
     add_to_workout: 'INSERT INTO WorkoutsExercises(workoutID, exerciseID) VALUES (?, ?)',
     remove_from_workout: 'DELETE FROM WorkoutsExercises WHERE workoutID = ? AND exerciseID = ?',
     create: 'INSERT INTO Exercises(name, categoryID) VALUES (?, ?)',
+    by_category_id: 'SELECT exerciseID, name FROM Exercises WHERE categoryID = ?',
+    for_equipment_id: 'SELECT Exercises.exerciseID, Exercises.name FROM Exercises JOIN ExercisesEquipment ON Exercises.exerciseID = ExercisesEquipment.exerciseID JOIN Equipment on ExercisesEquipment.equipmentID = Equipment.equipmentID WHERE Equipment.equipmentID = ?',
     search: {
       query: 'SELECT exerciseID, name FROM Exercises WHERE name LIKE ?',
       fields_count: 1

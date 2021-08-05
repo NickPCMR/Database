@@ -487,6 +487,11 @@ app.post('/workouts/:workout_id/exercises', (req, res) => {
 
     const workoutId = req.params.workout_id;
     const exerciseId = req.body.exerciseId;
+    
+    if (exerciseId == "null") {
+        res.redirect(`/workouts/${workoutId}?error=${encodeURIComponent('Please select an exercise before clicking add button')}`);
+        return;
+    }
 
     if (workoutId && exerciseId) {
         add_exercise_query = queries.exercises.add_to_workout;
@@ -770,6 +775,11 @@ app.post('/exercises/:exercise_id/equipment', (req, res) => {
 
     const exerciseId = req.params.exercise_id;
     const equipmentId = req.body.equipmentId;
+    
+    if (equipmentId == 'null') {
+        res.redirect(`/exercises/${exerciseId}?error=${encodeURIComponent('Please select equipment before clicking add button')}`);
+        return;
+    }
 
     if (exerciseId && equipmentId) {
         add_equipment_query = queries.equipment.add_to_exercise;
@@ -911,14 +921,25 @@ app.get('/equipment/:equipment_id', (req, res) => {
     db.pool.query(equipment_query, equipmentId, (error, rows, _fields) => {
         if (!error) {
             data.locals.equipment = rows[0]
+            
+            exercises_query = queries.exercises.for_equipment_id;
 
-            res.render('equipment/detail', data);
+            db.pool.query(exercises_query, equipmentId, (error, rows, _fields) => {
+                if (!error) {
+                    data.locals.exercises = rows;
+                    res.render('equipment/detail', data);
+                } else {
+                    data.locals.error = error;
+                    res.status(500);
+                    res.render('500', data);
+                }
+            });
         } else {
             data.locals.error = error;
             res.status(500);
             res.render('500', data);
         }
-    })
+    });
 });
 
 // Equipment edit
@@ -1068,15 +1089,26 @@ app.get('/categories/:category_id', (req, res) => {
 
     db.pool.query(category_query, categoryId, (error, rows, _fields) => {
         if (!error) {
-            data.locals.categories = rows[0]
-
-            res.render('categories/detail', data);
+            data.locals.category = rows[0];
+            
+            exercises_query = queries.exercises.by_category_id;
+            
+            db.pool.query(exercises_query, categoryId, (error, rows, _fields) => {
+                if (!error) {
+                    data.locals.exercises = rows;
+                    res.render('categories/detail', data);
+                } else {
+                    data.locals.error = error;
+                    res.status(500);
+                    res.render('500', data);
+                }
+            });
         } else {
             data.locals.error = error;
             res.status(500);
             res.render('500', data);
         }
-    })
+    });
 });
 
 // Categories edit
