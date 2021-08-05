@@ -2,7 +2,7 @@
   <div class="col-6 offset-3">
     <h1><%= (locals.user.firstName + ' ' + locals.user.lastName) %></h1>
     <p><%= locals.user.email %></p>
-    <a href="/users/<%= locals.user.userID %>/edit">Edit user</a>
+    <a class="btn btn-primary" href="/users/<%= locals.user.userID %>/edit">Edit user</a>
     <button class="btn btn-danger" id="deleteUser">Delete User</button>
   
     <h3>Workouts:</h3>

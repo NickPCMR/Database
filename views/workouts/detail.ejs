@@ -3,7 +3,7 @@
     <h1>Workout</h1>
     <p><%= locals.workout.date.toDateString() %></p>
     <p><%= locals.workout.description %></p>
-    <a href="/workouts/<%= locals.workout.workoutID %>/edit">Edit workout details</a>
+    <a class="btn btn-primary" href="/workouts/<%= locals.workout.workoutID %>/edit">Edit workout details</a>
     <button class="btn btn-danger" id="deleteWorkout">Delete Workout</button>
     
     <h3>Add Exercise</h3>
