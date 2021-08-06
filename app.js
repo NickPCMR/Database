@@ -972,7 +972,6 @@ app.get('/equipment/:equipment_id/edit', (req, res) => {
 });
 
 app.post('/equipment/:equipment_id/edit', (req, res) => {
-
     let data = { locals: {} };
 
     const equipmentId = req.params.equipment_id;

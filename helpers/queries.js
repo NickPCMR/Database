@@ -41,14 +41,14 @@ exports.queries = {
     }
   },
   equipment: {
-    create: ' INSERT INTO Equipment (name) values (?)',
     select_all: 'SELECT equipmentID, name FROM Equipment',
     find_by_id: 'SELECT equipmentID, name FROM Equipment WHERE equipmentID = ?',
-    by_exercise_id: 'SELECT Equipment.name, Equipment.equipmentID FROM Equipment JOIN ExercisesEquipment ON Equipment.equipmentID = ExercisesEquipment.equipmentID JOIN Exercises ON ExercisesEquipment.exerciseID = Exercises.exerciseID WHERE Exercises.exerciseID = ?',
     delete_by_id: 'DELETE FROM Equipment WHERE equipmentID = ?',
+    edit_by_id: 'UPDATE Equipment SET name = ? WHERE equipmentID = ?',
     add_to_exercise: 'INSERT INTO ExercisesEquipment(exerciseID, equipmentID) VALUES (?, ?)',
     remove_from_exercise: 'DELETE FROM ExercisesEquipment WHERE exerciseID = ? AND equipmentID = ?',
-    edit_by_id: 'UPDATE Equipment SET name = ? WHERE equipmentID = ?',
+    create: 'INSERT INTO Equipment (name) values (?)',
+    by_exercise_id: 'SELECT Equipment.name, Equipment.equipmentID FROM Equipment JOIN ExercisesEquipment ON Equipment.equipmentID = ExercisesEquipment.equipmentID JOIN Exercises ON ExercisesEquipment.exerciseID = Exercises.exerciseID WHERE Exercises.exerciseID = ?',
     search: {
       query: 'SELECT equipmentID, name FROM Equipment WHERE name LIKE ?',
       fields_count: 1
@@ -57,9 +57,9 @@ exports.queries = {
   categories: {
     select_all: 'SELECT categoryID, name FROM Categories',
     find_by_id: 'SELECT categoryID, name FROM Categories WHERE categoryID = ?',
-    create: 'INSERT INTO Categories (name) VALUES (?)',
-    edit_by_id: 'UPDATE Categories SET name = ? WHERE categoryID = ?',
     delete_by_id: 'DELETE FROM Categories WHERE categoryID = ?',
+    edit_by_id: 'UPDATE Categories SET name = ? WHERE categoryID = ?',
+    create: 'INSERT INTO Categories (name) VALUES (?)',
     search: {
       query: 'SELECT categoryID, name FROM Categories WHERE name LIKE ?',
       fields_count: 1
